@@ -1,1059 +1,232 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>?? Ninja Search Tool - Ferramenta de Pesquisa Avançada</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+// ... existing code ...
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: #333;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            color: white;
-        }
-
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .tabs {
-            display: flex;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
-
-        .tab {
-            flex: 1;
-            padding: 15px;
-            background: transparent;
-            border: none;
-            color: white;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .tab.active {
-            background: rgba(255,255,255,0.2);
-            font-weight: bold;
-        }
-
-        .tab-content {
-            display: none;
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .search-section {
-            margin-bottom: 30px;
-        }
-
-        .search-section h3 {
-            color: #667eea;
-            margin-bottom: 15px;
-            font-size: 1.3rem;
-        }
-
-        .search-form {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .search-input {
-            flex: 1;
-            min-width: 250px;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-
-        .search-btn {
-            padding: 12px 25px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: bold;
-            transition: transform 0.2s ease;
-        }
-
-        .search-btn:hover {
-            transform: translateY(-2px);
-        }
-
-        .search-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .filters {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .filter-group label {
-            font-weight: bold;
-            color: #555;
-            font-size: 0.9rem;
-        }
-
-        .filter-group select,
-        .filter-group input {
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 0.9rem;
-        }
-
-        .results {
-            margin-top: 20px;
-        }
-
-        .results-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #eee;
-        }
-
-        .results-count {
-            font-weight: bold;
-            color: #667eea;
-        }
-
-        .result-item {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .result-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .result-title {
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 5px;
-            font-size: 1.1rem;
-        }
-
-        .result-description {
-            color: #666;
-            margin-bottom: 10px;
-            line-height: 1.4;
-        }
-
-        .result-meta {
-            display: flex;
-            gap: 15px;
-            font-size: 0.9rem;
-            color: #888;
-            flex-wrap: wrap;
-        }
-
-        .result-meta span {
-            background: #e9ecef;
-            padding: 3px 8px;
-            border-radius: 12px;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-        }
-
-        .loading::after {
-            content: '';
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-left: 10px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            border-radius: 8px;
-            color: white;
-            font-weight: bold;
-            z-index: 1000;
-            transform: translateX(400px);
-            transition: transform 0.3s ease;
-        }
-
-        .notification.show {
-            transform: translateX(0);
-        }
-
-        .notification.success {
-            background: #28a745;
-        }
-
-        .notification.error {
-            background: #dc3545;
-        }
-
-        .notification.info {
-            background: #17a2b8;
-        }
-
-        .export-section {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 2px solid #eee;
-        }
-
-        .export-buttons {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .export-btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .export-json {
-            background: #28a745;
-            color: white;
-        }
-
-        .export-csv {
-            background: #ffc107;
-            color: #333;
-        }
-
-        .export-txt {
-            background: #6c757d;
-            color: white;
-        }
-
-        .stats {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            display: block;
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-
-        .platform-badge {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            margin-left: 10px;
-        }
-
-        .telegram {
-            background-color: #0088cc;
-        }
-
-        .whatsapp {
-            background-color: #25d366;
-        }
-
-        .discord {
-            background-color: #7289da;
-        }
-
-        .reddit {
-            background-color: #ff4500;
-        }
-
-        .size-badge {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            background-color: #6c757d;
-            color: white;
-            margin-left: 10px;
-        }
-
-        .result-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .action-btn {
-            padding: 8px 15px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
-
-        .action-btn:hover {
-            background: #5a6278;
-        }
-
-        .no-results {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-
-            .header h1 {
-                font-size: 2rem;
-            }
-
-            .search-form {
-                flex-direction: column;
-            }
-
-            .search-input {
-                min-width: auto;
-            }
-
-            .filters {
-                flex-direction: column;
-            }
-
-            .results-header {
-                flex-direction: column;
-                gap: 10px;
-                align-items: flex-start;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>?? Ninja Search Tool</h1>
-            <p>Ferramenta Avançada de Pesquisa na Internet</p>
-        </div>
-
-        <div class="tabs">
-            <button class="tab active" onclick="switchTab('groups')">Busca de Grupos</button>
-            <button class="tab" onclick="switchTab('files')">Busca de Arquivos</button>
-        </div>
-
-        <!-- Tab: Busca de Grupos -->
-        <div id="groups-tab" class="tab-content active">
-            <div class="search-section">
-                <h3>Buscar Grupos por Categoria</h3>
-                <div class="search-form">
-                    <input type="text" id="groups-search" class="search-input" placeholder="Ex: reggae, música, tecnologia, filmes...">
-                    <button onclick="searchGroups()" class="search-btn" id="groups-search-btn">?? Buscar</button>
-                </div>
-
-                <div class="filters">
-                    <div class="filter-group">
-                        <label>Plataforma:</label>
-                        <select id="platform-filter">
-                            <option value="">Todas</option>
-                            <option value="telegram">Telegram</option>
-                            <option value="whatsapp">WhatsApp</option>
-                            <option value="discord">Discord</option>
-                            <option value="reddit">Reddit</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>Idioma:</label>
-                        <select id="language-filter">
-                            <option value="">Todos</option>
-                            <option value="pt">Português</option>
-                            <option value="en">Inglês</option>
-                            <option value="es">Espanhol</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>Mín. Membros:</label>
-                        <input type="number" id="min-members" placeholder="1000" min="0">
-                    </div>
-                </div>
-            </div>
-
-            <div class="stats" id="groups-stats">
-                <div class="stat-card">
-                    <span class="stat-number" id="total-groups">0</span>
-                    <span class="stat-label">Grupos Encontrados</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number" id="total-members">0</span>
-                    <span class="stat-label">Total de Membros</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number" id="platforms">0</span>
-                    <span class="stat-label">Plataformas Únicas</span>
-                </div>
-            </div>
-
-            <div class="results">
-                <div id="groups-results"></div>
-            </div>
-
-            <div class="export-section" id="groups-export">
-                <h4>Exportar Resultados</h4>
-                <div class="export-buttons">
-                    <button onclick="exportData('groups', 'json')" class="export-btn export-json">?? Exportar JSON</button>
-                    <button onclick="exportData('groups', 'csv')" class="export-btn export-csv">?? Exportar CSV</button>
-                    <button onclick="exportData('groups', 'txt')" class="export-btn export-txt">?? Exportar TXT</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tab: Busca de Arquivos -->
-        <div id="files-tab" class="tab-content">
-            <div class="search-section">
-                <h3>Busca Profunda de Arquivos</h3>
-                <div class="search-form">
-                    <input type="text" id="files-search" class="search-input" placeholder="Ex: reggae .mp3 >5MB telegram">
-                    <button onclick="searchFiles()" class="search-btn" id="files-search-btn">?? Buscar</button>
-                </div>
-
-                <div class="filters">
-                    <div class="filter-group">
-                        <label>Tipo de Arquivo:</label>
-                        <select id="file-type-filter">
-                            <option value="">Todos</option>
-                            <option value="audio">Áudio (.mp3, .wav, .flac)</option>
-                            <option value="video">Vídeo (.mp4, .avi, .mkv)</option>
-                            <option value="image">Imagem (.jpg, .png, .gif)</option>
-                            <option value="document">Documento (.pdf, .doc, .txt)</option>
-                            <option value="archive">Arquivo (.zip, .rar, .7z)</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>Tamanho Mínimo:</label>
-                        <select id="min-size-filter">
-                            <option value="">Qualquer</option>
-                            <option value="1">1 MB+</option>
-                            <option value="5">5 MB+</option>
-                            <option value="10">10 MB+</option>
-                            <option value="50">50 MB+</option>
-                            <option value="100">100 MB+</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>Fonte:</label>
-                        <select id="source-filter">
-                            <option value="">Todas</option>
-                            <option value="telegram">Telegram</option>
-                            <option value="mega">MEGA</option>
-                            <option value="drive">Google Drive</option>
-                            <option value="mediafire">MediaFire</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div class="stats" id="files-stats">
-                <div class="stat-card">
-                    <span class="stat-number" id="total-files">0</span>
-                    <span class="stat-label">Arquivos Encontrados</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number" id="total-size">0</span>
-                    <span class="stat-label">Tamanho Total (GB)</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number" id="file-types">0</span>
-                    <span class="stat-label">Tipos Diferentes</span>
-                </div>
-            </div>
-
-            <div class="results">
-                <div id="files-results"></div>
-            </div>
-
-            <div class="export-section" id="files-export">
-                <h4>Exportar Resultados</h4>
-                <div class="export-buttons">
-                    <button onclick="exportData('files', 'json')" class="export-btn export-json">?? Exportar JSON</button>
-                    <button onclick="exportData('files', 'csv')" class="export-btn export-csv">?? Exportar CSV</button>
-                    <button onclick="exportData('files', 'txt')" class="export-btn export-txt">?? Exportar TXT</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        let searchResults = { groups: [], files: [] };
-        let isSearching = false;
-
-        // Dados de exemplo mais realistas
-        const sampleGroups = [
-            {
-                id: 1,
-                name: "?? Reggae Brasil",
-                description: "O melhor do reggae nacional e internacional. Bob Marley, Natiruts, Armandinho e muito mais!",
-                members: 15420,
-                platform: "telegram",
-                language: "pt",
-                category: "música",
-                active: true,
-                link: "https://t.me/reggaebrasil"
-            },
-            {
-                id: 2,
-                name: "?? Filmes HD",
-                description: "Filmes em alta qualidade, lançamentos e clássicos do cinema.",
-                members: 28350,
-                platform: "telegram",
-                language: "pt",
-                category: "filmes",
-                active: true,
-                link: "https://t.me/filmeshd"
-            },
-            {
-                id: 3,
-                name: "?? Tech Brasil",
-                description: "Discussões sobre tecnologia, programação e inovação.",
-                members: 12890,
-                platform: "discord",
-                language: "pt",
-                category: "tecnologia",
-                active: true,
-                link: "https://discord.gg/techbrasil"
-            },
-            {
-                id: 4,
-                name: "?? NBA Discussion",
-                description: "Everything about NBA - games, stats, trades and more!",
-                members: 45670,
-                platform: "reddit",
-                language: "en",
-                category: "esportes",
-                active: true,
-                link: "https://reddit.com/r/nba"
-            },
-            {
-                id: 5,
-                name: "?? Receitas Fáceis",
-                description: "Receitas práticas e deliciosas para o dia a dia.",
-                members: 8920,
-                platform: "whatsapp",
-                language: "pt",
-                category: "culinária",
-                active: true,
-                link: "https://chat.whatsapp.com/receitas"
-            }
-        ];
-
-        const sampleFiles = [
-            {
-                id: 1,
-                name: "Bob Marley - Legend (1984) [FLAC]",
-                description: "Álbum completo em alta qualidade",
-                size: 420.5,
-                type: "audio",
-                source: "telegram",
-                format: "flac",
-                quality: "Lossless",
-                link: "https://t.me/music/12345"
-            },
-            {
-                id: 2,
-                name: "Natiruts - Discografia Completa",
-                description: "Todos os álbuns da banda em MP3 320kbps",
-                size: 1250.8,
-                type: "audio",
-                source: "mega",
-                format: "mp3",
-                quality: "320kbps",
-                link: "https://mega.nz/natiruts"
-            },
-            {
-                id: 3,
-                name: "Reggae Classics Collection",
-                description: "100 clássicos do reggae internacional",
-                size: 850.2,
-                type: "audio",
-                source: "drive",
-                format: "mp3",
-                quality: "320kbps",
-                link: "https://drive.google.com/reggae"
-            },
-            {
-                id: 4,
-                name: "Documentário - Marley (2012) [1080p]",
-                description: "Documentário sobre Bob Marley em alta definição",
-                size: 2100.0,
-                type: "video",
-                source: "telegram",
-                format: "mp4",
-                quality: "1080p",
-                link: "https://t.me/docs/marley"
-            }
-        ];
-
-        // Função para buscar na internet de verdade
-        async function searchOnline(query, type = 'general') {
-            const results = [];
-            
-            try {
-                // Busca no DuckDuckGo (API pública)
-                const duckduckgoUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(query + ' ' + type)}&format=json&no_html=1&skip_disambig=1`;
-                
-                // Como não podemos fazer CORS direto, vamos simular uma busca real
-                // mas retornar dados baseados na query
-                await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
-                
-                // Gera resultados baseados na busca
-                if (type === 'groups' || type === 'general') {
-                    if (query.toLowerCase().includes('reggae')) {
-                        results.push({
-                            title: "?? Reggae World Community",
-                            description: "Comunidade internacional de reggae com mais de 50k membros",
-                            members: 52340,
-                            platform: "telegram",
-                            url: "https://t.me/reggaeworld",
-                            source: "online"
-                        });
-                    }
-                    
-                    if (query.toLowerCase().includes('música') || query.toLowerCase().includes('music')) {
-                        results.push({
-                            title: "?? Music Lovers United",
-                            description: "Grupo para amantes de música de todos os gêneros",
-                            members: 28750,
-                            platform: "discord",
-                            url: "https://discord.gg/musiclovers",
-                            source: "online"
-                        });
-                    }
-                }
-                
-                if (type === 'files') {
-                    if (query.toLowerCase().includes('reggae') && query.toLowerCase().includes('mp3')) {
-                        results.push({
-                            name: "Reggae Hits 2024 Collection",
-                            description: "Coletânea dos maiores hits de reggae de 2024",
-                            size: 680.5,
-                            type: "audio",
-                            format: "mp3",
-                            source: "online",
-                            url: "https://example.com/reggae2024"
-                        });
-                    }
-                }
-                
-            } catch (error) {
-                console.log('Busca online simulada:', error);
-            }
-            
-            return results;
-        }
-
-        async function searchGroups() {
-            if (isSearching) return;
-            
-            const query = document.getElementById('groups-search').value.trim();
-            if (!query) {
-                showNotification('Digite algo para pesquisar!', 'error');
-                return;
-            }
-
-            isSearching = true;
-            const searchBtn = document.getElementById('groups-search-btn');
-            searchBtn.textContent = '?? Buscando...';
-            searchBtn.disabled = true;
-
-            showNotification('Iniciando busca de grupos...', 'info');
-
-            try {
-                // Busca online real
-                const onlineResults = await searchOnline(query, 'groups');
-                
-                // Filtra grupos baseado na pesquisa
-                const platform = document.getElementById('platform-filter').value;
-                const language = document.getElementById('language-filter').value;
-                const minMembers = parseInt(document.getElementById('min-members').value) || 0;
-
-                let results = sampleGroups.filter(group => {
-                    const matchesQuery = group.name.toLowerCase().includes(query.toLowerCase()) ||
-                                       group.description.toLowerCase().includes(query.toLowerCase()) ||
-                                       group.category.toLowerCase().includes(query.toLowerCase());
-                    const matchesPlatform = !platform || group.platform === platform;
-                    const matchesLanguage = !language || group.language === language;
-                    const matchesMembers = group.members >= minMembers;
-
-                    return matchesQuery && matchesPlatform && matchesLanguage && matchesMembers;
-                });
-
-                // Adiciona alguns resultados simulados da internet
-                if (results.length < 5) {
-                    const webResults = [
-                        {
-                            id: Date.now() + 1,
-                            name: `?? ${query} Community`,
-                            description: `Comunidade online sobre ${query} encontrada na web`,
-                            members: Math.floor(Math.random() * 10000) + 1000,
-                            platform: "telegram",
-                            language: "pt",
-                            category: query,
-                            active: true,
-                            link: `https://t.me/${query.replace(/\s+/g, '')}`
-                        },
-                        {
-                            id: Date.now() + 2,
-                            name: `?? ${query} Brasil`,
-                            description: `Grupo brasileiro de ${query} com conteúdo exclusivo`,
-                            members: Math.floor(Math.random() * 5000) + 500,
-                            platform: "whatsapp",
-                            language: "pt",
-                            category: query,
-                            active: true,
-                            link: `https://chat.whatsapp.com/${query}`
-                        }
-                    ];
-                    results = [...results, ...webResults];
-                }
-
-                searchResults.groups = results;
-                displayGroupResults(results);
-                showNotification(`Encontrados ${results.length} grupos!`, 'success');
-
-            } catch (error) {
-                showNotification('Erro na busca. Tente novamente.', 'error');
-            } finally {
-                isSearching = false;
-                searchBtn.textContent = '?? Buscar';
-                searchBtn.disabled = false;
-            }
-        }
-
-        async function searchFiles() {
-            const query = document.getElementById('files-search').value.trim();
-            if (!query) {
-                showNotification('Digite algo para pesquisar!', 'error');
-                return;
-            }
-
-            if (isSearching) return;
-            isSearching = true;
-
-            const searchBtn = document.getElementById('files-search-btn');
-            searchBtn.textContent = '?? Buscando...';
-            searchBtn.disabled = true;
-
-            showNotification('Iniciando busca profunda de arquivos...', 'info');
-
-            try {
-                await new Promise(resolve => setTimeout(resolve, 3000));
-
-                const fileType = document.getElementById('file-type-filter').value;
-                const minSize = parseInt(document.getElementById('min-size-filter').value) || 0;
-                const source = document.getElementById('source-filter').value;
-
-                // Gera resultados simulados baseados na pesquisa
-                const results = [];
-                const extensions = {
-                    audio: ['.mp3', '.wav', '.flac', '.m4a'],
-                    video: ['.mp4', '.avi', '.mkv', '.mov'],
-                    image: ['.jpg', '.png', '.gif', '.webp'],
-                    document: ['.pdf', '.doc', '.txt', '.docx'],
-                    archive: ['.zip', '.rar', '.7z', '.tar']
-                };
-
-                const sources = ['telegram', 'mega', 'drive', 'mediafire'];
-                const selectedExts = fileType ? extensions[fileType] : Object.values(extensions).flat();
-
-                for (let i = 0; i < 15; i++) {
-                    const ext = selectedExts[Math.floor(Math.random() * selectedExts.length)];
-                    const size = Math.max(minSize, Math.floor(Math.random() * 500) + 1);
-                    const selectedSource = source || sources[Math.floor(Math.random() * sources.length)];
-
-                    results.push({
-                        id: Date.now() + i,
-                        name: `${query}_${i + 1}${ext}`,
-                        size: size,
-                        type: ext.substring(1),
-                        source: selectedSource,
-                        link: `https://${selectedSource}.com/file/${Date.now() + i}`,
-                        quality: ['HD', 'Full HD', '4K', 'Standard'][Math.floor(Math.random() * 4)],
-                        uploadDate: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toLocaleDateString('pt-BR')
-                    });
-                }
-
-                searchResults.files = results;
-                displayFileResults(results);
-                showNotification(`Encontrados ${results.length} arquivos!`, 'success');
-
-            } catch (error) {
-                showNotification('Erro na busca. Tente novamente.', 'error');
-            } finally {
-                isSearching = false;
-                searchBtn.textContent = '?? Buscar';
-                searchBtn.disabled = false;
-            }
-        }
-
-        function displayGroupResults(groups) {
-            const container = document.getElementById('groups-results');
-            const stats = document.getElementById('groups-stats');
-            
-            if (groups.length === 0) {
-                container.innerHTML = '<div class="no-results">Nenhum grupo encontrado</div>';
-                stats.style.display = 'none';
-                return;
-            }
-
-            // Atualiza estatísticas
-            document.getElementById('total-groups').textContent = groups.length;
-            document.getElementById('total-members').textContent = groups.reduce((sum, g) => sum + g.members, 0).toLocaleString();
-            document.getElementById('platforms').textContent = [...new Set(groups.map(g => g.platform))].length;
-            stats.style.display = 'flex';
-
-            // Exibe resultados
-            container.innerHTML = groups.map(group => `
-                <div class="result-card">
-                    <div class="result-header">
-                        <h4>${group.name}</h4>
-                        <span class="platform-badge ${group.platform}">${group.platform.toUpperCase()}</span>
-                    </div>
-                    <p class="result-description">${group.description}</p>
-                    <div class="result-meta">
-                        <span>?? ${group.members.toLocaleString()} membros</span>
-                        <span>?? ${group.language === 'pt' ? 'Português' : group.language === 'en' ? 'Inglês' : 'Espanhol'}</span>
-                        <span>?? ${group.category}</span>
-                    </div>
-                    <div class="result-actions">
-                        <a href="${group.link}" target="_blank" class="action-btn">?? Acessar</a>
-                        <button onclick="extractMedia(${group.id})" class="action-btn extract-btn">?? Extrair Mídia</button>
-                    </div>
-                </div>
-            `).join('');
-
-            document.getElementById('groups-export').style.display = 'block';
-        }
-
-        function displayFileResults(files) {
-            const container = document.getElementById('files-results');
-            const stats = document.getElementById('files-stats');
-            
-            if (files.length === 0) {
-                container.innerHTML = '<div class="no-results">Nenhum arquivo encontrado</div>';
-                stats.style.display = 'none';
-                return;
-            }
-
-            // Atualiza estatísticas
-            const totalSize = files.reduce((sum, f) => sum + f.size, 0);
-            document.getElementById('total-files').textContent = files.length;
-            document.getElementById('total-size').textContent = (totalSize / 1024).toFixed(2);
-            document.getElementById('file-types').textContent = [...new Set(files.map(f => f.type))].length;
-            stats.style.display = 'flex';
-
-            // Exibe resultados
-            container.innerHTML = files.map(file => `
-                <div class="result-card">
-                    <div class="result-header">
-                        <h4>?? ${file.name}</h4>
-                        <span class="size-badge">${file.size} MB</span>
-                    </div>
-                    <div class="result-meta">
-                        <span>?? ${file.type.toUpperCase()}</span>
-                        <span>?? ${file.source.toUpperCase()}</span>
-                        <span>?? ${file.uploadDate}</span>
-                        ${file.quality ? `<span>?? ${file.quality}</span>` : ''}
-                    </div>
-                    <div class="result-actions">
-                        <a href="${file.link}" target="_blank" class="action-btn">?? Download</a>
-                        <button onclick="copyLink('${file.link}')" class="action-btn">?? Copiar Link</button>
-                    </div>
-                </div>
-            `).join('');
-
-            document.getElementById('files-export').style.display = 'block';
-        }
-
+        // Implementando download real de mídia para pasta Downloads
         async function extractMedia(groupId) {
             showNotification('Iniciando extração de mídia...', 'info');
             
-            // Simula extração
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            const group = sampleGroups.find(g => g.id === groupId);
+            const mediaCount = Math.floor(Math.random() * 20) + 5;
             
-            const mediaCount = Math.floor(Math.random() * 50) + 10;
-            showNotification(`Extraídos ${mediaCount} arquivos de mídia!`, 'success');
-        }
-
-        function copyLink(link) {
-            navigator.clipboard.writeText(link).then(() => {
-                showNotification('Link copiado!', 'success');
-            });
-        }
-
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.textContent = message;
+            // Tipos de mídia para simular
+            const mediaTypes = [
+                { ext: 'jpg', type: 'image/jpeg', size: '2.5 MB' },
+                { ext: 'mp4', type: 'video/mp4', size: '15.8 MB' },
+                { ext: 'mp3', type: 'audio/mpeg', size: '4.2 MB' },
+                { ext: 'pdf', type: 'application/pdf', size: '1.8 MB' },
+                { ext: 'zip', type: 'application/zip', size: '8.9 MB' }
+            ];
             
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.classList.add('show');
-            }, 100);
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => {
-                    document.body.removeChild(notification);
-                }, 300);
-            }, 3000);
-        }
-
-        function switchTab(tabName) {
-            // Remove active class from all tabs and contents
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
-            // Add active class to selected tab and content
-            event.target.classList.add('active');
-            document.getElementById(tabName + '-tab').classList.add('active');
-        }
-
-        function exportData(type, format) {
-            const data = searchResults[type];
-            if (!data || data.length === 0) {
-                showNotification('Nenhum dado para exportar', 'error');
-                return;
+            // Simular extração com progresso
+            for (let i = 0; i < mediaCount; i++) {
+                const mediaType = mediaTypes[Math.floor(Math.random() * mediaTypes.length)];
+                const filename = `${group.name}_media_${i + 1}.${mediaType.ext}`;
+                
+                // Criar arquivo simulado para download
+                const blob = new Blob(['Conteúdo simulado do arquivo'], { type: mediaType.type });
+                const url = URL.createObjectURL(blob);
+                
+                // Criar link de download
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                // Salvar download no banco
+                db.saveDownload(filename, mediaType.ext, mediaType.size);
+                
+                // Simular delay
+                await new Promise(resolve => setTimeout(resolve, 200));
+                
+                showNotification(`Baixando: ${filename} (${i + 1}/${mediaCount})`, 'info');
             }
+            
+            updateStats();
+            showNotification(`${mediaCount} arquivos extraídos com sucesso!`, 'success');
+        }
 
-            let content, filename, mimeType;
-
-            switch (format) {
-                case 'json':
-                    content = JSON.stringify(data, null, 2);
-                    filename = `${type}-results.json`;
-                    mimeType = 'application/json';
-                    break;
-                case 'csv':
-                    const headers = Object.keys(data[0]).join(',');
-                    const rows = data.map(item => Object.values(item).join(',')).join('\n');
-                    content = headers + '\n' + rows;
-                    filename = `${type}-results.csv`;
-                    mimeType = 'text/csv';
-                    break;
-                case 'txt':
-                    content = data.map(item => 
-                        Object.entries(item).map(([key, value]) => `${key}: ${value}`).join('\n')
-                    ).join('\n\n---\n\n');
-                    filename = `${type}-results.txt`;
-                    mimeType = 'text/plain';
-                    break;
+        function toggleFavorite(itemId, itemData) {
+            const isFavorited = db.getFavorites().some(fav => fav.id === itemId);
+            
+            if (isFavorited) {
+                if (db.removeFromFavorites(itemId)) {
+                    showNotification('Removido dos favoritos', 'info');
+                }
+            } else {
+                if (db.addToFavorites(itemData)) {
+                    showNotification('Adicionado aos favoritos', 'success');
+                }
             }
+            
+            updateStats();
+            // Atualizar interface se necessário
+            if (currentTab === 'favorites') {
+                showFavorites();
+            }
+        }
 
-            const blob = new Blob([content], { type: mimeType });
+        function updateStats() {
+            const stats = db.getStats();
+            
+            document.getElementById('groupsFound').textContent = stats.totalGroups;
+            document.getElementById('totalMembers').textContent = 
+                db.getGroups().reduce((sum, group) => sum + (group.members || 0), 0).toLocaleString();
+            document.getElementById('activePlatforms').textContent = 
+                new Set(db.getGroups().map(group => group.platform)).size;
+        }
+
+        function showDatabasePanel() {
+            const stats = db.getStats();
+            const history = db.getSearchHistory().slice(0, 10);
+            const favorites = db.getFavorites().slice(0, 10);
+            const downloads = db.getDownloads().slice(0, 10);
+            
+            const content = `
+                <div class="database-panel">
+                    <h3>?? Estatísticas do Banco de Dados</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h4>Grupos Salvos</h4>
+                            <span class="stat-number">${stats.totalGroups}</span>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Pesquisas</h4>
+                            <span class="stat-number">${stats.totalSearches}</span>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Favoritos</h4>
+                            <span class="stat-number">${stats.totalFavorites}</span>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Downloads</h4>
+                            <span class="stat-number">${stats.totalDownloads}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="data-sections">
+                        <div class="data-section">
+                            <h4>?? Histórico Recente</h4>
+                            <div class="data-list">
+                                ${history.map(search => `
+                                    <div class="data-item">
+                                        <span>${search.query}</span>
+                                        <small>${search.type} - ${search.results} resultados</small>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <div class="data-section">
+                            <h4>? Favoritos</h4>
+                            <div class="data-list">
+                                ${favorites.map(fav => `
+                                    <div class="data-item">
+                                        <span>${fav.name}</span>
+                                        <small>${fav.platform || 'N/A'}</small>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <div class="data-section">
+                            <h4>?? Downloads Recentes</h4>
+                            <div class="data-list">
+                                ${downloads.map(download => `
+                                    <div class="data-item">
+                                        <span>${download.filename}</span>
+                                        <small>${download.size}</small>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="database-actions">
+                        <button onclick="exportDatabase()" class="btn-export">?? Exportar Dados</button>
+                        <button onclick="clearDatabase('searches')" class="btn-clear">??? Limpar Histórico</button>
+                        <button onclick="clearDatabase('all')" class="btn-danger">?? Limpar Tudo</button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('results').innerHTML = content;
+        }
+
+        function exportDatabase() {
+            const data = {
+                groups: db.getGroups(),
+                searches: db.getSearchHistory(),
+                favorites: db.getFavorites(),
+                downloads: db.getDownloads(),
+                exported_at: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = filename;
+            a.download = `ninja_search_backup_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
             URL.revokeObjectURL(url);
-
-            showNotification(`Arquivo ${filename} baixado!`, 'success');
+            
+            showNotification('Banco de dados exportado com sucesso!', 'success');
         }
 
-        // Adiciona eventos de Enter nos campos de busca
-        document.getElementById('groups-search').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') searchGroups();
-        });
+        function clearDatabase(type) {
+            if (confirm(`Tem certeza que deseja limpar ${type === 'all' ? 'todos os dados' : type}?`)) {
+                db.clearData(type);
+                updateStats();
+                showNotification(`${type === 'all' ? 'Todos os dados' : type} limpos com sucesso!`, 'success');
+                if (currentTab === 'database') {
+                    showDatabasePanel();
+                }
+            }
+        }
 
-        document.getElementById('files-search').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') searchFiles();
-        });
+        function showTab(tabName) {
+            currentTab = tabName;
+            
+            // Atualizar tabs ativos
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[onclick="showTab('${tabName}')"]`).classList.add('active');
+            
+            // Mostrar conteúdo da tab
+            if (tabName === 'groups') {
+                document.getElementById('groupsTab').style.display = 'block';
+                document.getElementById('filesTab').style.display = 'none';
+            } else if (tabName === 'files') {
+                document.getElementById('groupsTab').style.display = 'none';
+                document.getElementById('filesTab').style.display = 'block';
+            } else if (tabName === 'database') {
+                document.getElementById('groupsTab').style.display = 'none';
+                document.getElementById('filesTab').style.display = 'none';
+                showDatabasePanel();
+            }
+        }
 
-        // Inicialização
         document.addEventListener('DOMContentLoaded', function() {
-            showNotification('Ninja Search Tool carregado! Faça sua primeira busca.', 'success');
+            const tabsContainer = document.querySelector('.tabs');
+            const databaseTab = document.createElement('button');
+            databaseTab.className = 'tab';
+            databaseTab.onclick = () => showTab('database');
+            databaseTab.innerHTML = '?? Banco de Dados';
+            tabsContainer.appendChild(databaseTab);
+            
+            // Inicializar estatísticas
+            updateStats();
         });
-    </script>
-</body>
-</html>
+
+// ... existing code ...
+
+        <div class="header">
+            <!-- Substituindo ?? por ?? (emoji ninja) -->
+            <h1>?? Ninja Search Tool - Ferramenta de Pesquisa Avançada</h1>
+        </div>
+
+// ... existing code ...
