@@ -524,7 +524,212 @@
             return unique;
         }
 
+        async function deepFileSearchGitHub(queries, extensions) {
+            const results = [];
+            for (const query of queries) {
+                for (const ext of extensions) {
+                    const files = await simulateFileSearch(query, ext, 'GitHub');
+                    results.push(...files);
+                }
+            }
+            return results;
+        }
 
+        async function deepFileSearchArchive(queries, extensions) {
+            const results = [];
+            for (const query of queries) {
+                const files = await simulateFileSearch(query, 'archive', 'Internet Archive');
+                results.push(...files);
+            }
+            return results;
+        }
+
+        async function deepFileSearchTorrent(queries, extensions) {
+            const results = [];
+            for (const query of queries) {
+                const files = await simulateFileSearch(query, 'torrent', 'Torrent');
+                results.push(...files);
+            }
+            return results;
+        }
+
+        async function deepFileSearchCloud(queries, extensions) {
+            const results = [];
+            for (const query of queries) {
+                const files = await simulateFileSearch(query, 'cloud', 'Cloud Storage');
+                results.push(...files);
+            }
+            return results;
+        }
+
+        async function deepFileSearchFTP(queries, extensions) {
+            const results = [];
+            for (const query of queries) {
+                const files = await simulateFileSearch(query, 'ftp', 'FTP Server');
+                results.push(...files);
+            }
+            return results;
+        }
+
+        async function deepFileSearchP2P(queries, extensions) {
+            const results = [];
+            for (const query of queries) {
+                const files = await simulateFileSearch(query, 'p2p', 'P2P Network');
+                results.push(...files);
+            }
+            return results;
+        }
+
+        async function simulateFileSearch(query, type, source) {
+            await new Promise(resolve => setTimeout(resolve, 300 + Math.random() * 700));
+            
+            const results = [];
+            const numResults = Math.floor(Math.random() * 10) + 3;
+            
+            for (let i = 0; i < numResults; i++) {
+                const file = {
+                    id: `file_${Date.now()}_${i}`,
+                    name: `${query}_${type}_${i + 1}`,
+                    type: getFileTypeFromExtension(type),
+                    size: (Math.random() * 100 + 1).toFixed(1) + ' MB',
+                    source: source,
+                    quality: Math.random() > 0.5 ? 'HD' : 'SD',
+                    seeders: Math.floor(Math.random() * 1000),
+                    downloadUrl: `https://example.com/download/${query}_${i}`
+                };
+                results.push(file);
+            }
+            
+            return results;
+        }
+
+        function getFileTypeFromExtension(ext) {
+            const types = {
+                'mp4': 'Vídeo', 'avi': 'Vídeo', 'mkv': 'Vídeo',
+                'mp3': 'Áudio', 'flac': 'Áudio', 'wav': 'Áudio',
+                'jpg': 'Imagem', 'png': 'Imagem', 'gif': 'Imagem',
+                'pdf': 'Documento', 'doc': 'Documento', 'txt': 'Documento',
+                'zip': 'Compactado', 'rar': 'Compactado'
+            };
+            return types[ext] || 'Arquivo';
+        }
+
+        function rankFileResults(files, query) {
+            return files.map(file => {
+                let score = 0;
+                const queryLower = query.toLowerCase();
+                const nameLower = file.name.toLowerCase();
+                
+                if (nameLower.includes(queryLower)) score += 10;
+                if (file.quality === 'HD') score += 3;
+                if (file.seeders > 100) score += 2;
+                
+                return { ...file, relevanceScore: score };
+            }).sort((a, b) => b.relevanceScore - a.relevanceScore);
+        }
+
+        function displayGroupResults(groups, query) {
+            if (groups.length === 0) {
+                document.getElementById('results').innerHTML = '<div class="no-results">Nenhum grupo encontrado</div>';
+                return;
+            }
+
+            const html = groups.map(group => `
+                <div class="result-item">
+                    <div class="result-header">
+                        <h3>${group.name}</h3>
+                        <span class="platform-badge ${group.platform.toLowerCase()}">${group.platform}</span>
+                    </div>
+                    <p class="result-description">${group.description}</p>
+                    <div class="result-stats">
+                        <span>?? ${group.members.toLocaleString()} membros</span>
+                        <span>?? ${group.language}</span>
+                        <span>?? ${group.category}</span>
+                    </div>
+                    <div class="result-actions">
+                        <button onclick="window.open('${group.link}')" class="btn-access">?? Acessar</button>
+                        <button onclick="extractMedia('${group.id}')" class="btn-extract">?? Extrair Mídia</button>
+                        <button onclick="toggleFavorite('${group.id}', ${JSON.stringify(group).replace(/"/g, '&quot;')})" class="btn-favorite">? Favoritar</button>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function displayFileResults(files, query) {
+            if (files.length === 0) {
+                document.getElementById('results').innerHTML = '<div class="no-results">Nenhum arquivo encontrado</div>';
+                return;
+            }
+
+            const html = files.map(file => `
+                <div class="result-item">
+                    <div class="result-header">
+                        <h3>${file.name}</h3>
+                        <span class="file-type-badge">${file.type}</span>
+                    </div>
+                    <div class="result-stats">
+                        <span>?? ${file.size}</span>
+                        <span>?? ${file.source}</span>
+                        <span>? ${file.seeders} seeders</span>
+                    </div>
+                    <div class="result-actions">
+                        <button onclick="window.open('${file.downloadUrl}')" class="btn-download">?? Download</button>
+                        <button onclick="toggleFavorite('${file.id}', ${JSON.stringify(file).replace(/"/g, '&quot;')})" class="btn-favorite">? Favoritar</button>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('results').innerHTML = html;
+        }
+
+        async function deepSearchWhatsApp(queries, minMembers) {
+            const results = [];
+            for (const query of queries) {
+                const groups = await simulateAdvancedSearch(query, 'whatsapp', 'WhatsApp');
+                results.push(...groups.filter(g => g.members >= minMembers));
+            }
+            return results;
+        }
+
+        async function deepSearchDiscord(queries, minMembers) {
+            const results = [];
+            for (const query of queries) {
+                const groups = await simulateAdvancedSearch(query, 'discord', 'Discord');
+                results.push(...groups.filter(g => g.members >= minMembers));
+            }
+            return results;
+        }
+
+        async function deepSearchReddit(queries) {
+            const results = [];
+            for (const query of queries) {
+                const groups = await simulateAdvancedSearch(query, 'reddit', 'Reddit');
+                results.push(...groups);
+            }
+            return results;
+        }
+
+        async function deepSearchGitHub(queries) {
+            const results = [];
+            for (const query of queries) {
+                const groups = await simulateAdvancedSearch(query, 'github', 'GitHub');
+                results.push(...groups);
+            }
+            return results;
+        }
+
+        async function deepSearchSocialMedia(queries) {
+            const results = [];
+            for (const query of queries) {
+                const groups = await simulateAdvancedSearch(query, 'social', 'Social Media');
+                results.push(...groups);
+            }
+            return results;
+        }
+
+        // Existing HTML structure
         <div class="header">
             <!-- Substituindo ?? por ?? (emoji ninja) -->
             <h1>?? Ninja Search Tool - Ferramenta de Pesquisa Avançada</h1>
