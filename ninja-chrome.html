@@ -735,7 +735,7 @@
                         const parsedGroups = parseTelegramHTML(html, query);
                         groups.push(...parsedGroups);
                         
-                        if (groups.length >= 10) break; // Limitar resultados
+                        if (groups.length >= 10) break;
                     } catch (error) {
                         console.warn(`Falha na API do Telegram: ${apiUrl}`, error);
                     }
@@ -757,7 +757,6 @@
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
                 
-                // Buscar por padrões comuns em sites de busca do Telegram
                 const groupElements = doc.querySelectorAll('.group-item, .channel-item, .result-item');
                 
                 groupElements.forEach((element, index) => {
@@ -780,7 +779,6 @@
                     }
                 });
                 
-                // Se não encontrou grupos no HTML, gerar alguns baseados na busca
                 if (groups.length === 0) {
                     for (let i = 0; i < 3; i++) {
                         groups.push({
@@ -988,6 +986,19 @@
                 downloads: 2100
             }
         ];
+
+        // Tab switching
+        function switchTab(tabName) {
+            currentTab = tabName;
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelector(`button[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            
+            // Update tab panels
+            document.querySelectorAll('.tab-panel').forEach(panel => panel.style.display = 'none');
+            document.getElementById(`${tabName}-tab`).style.display = 'block';
+        }
 
         // Groups search - Implementando pesquisa real
         async function searchGroups() {
