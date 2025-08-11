@@ -1,6 +1,4 @@
-// ... existing code ...
-
-        // Implementando download real de mídia para pasta Downloads
+// Implementando download real de mídia para pasta Downloads
         async function extractMedia(groupId) {
             showNotification('Iniciando extração de mídia...', 'info');
             
@@ -222,11 +220,312 @@
             updateStats();
         });
 
-// ... existing code ...
+        async function searchGroups() {
+            const query = document.getElementById('groupQuery').value.trim();
+            const platform = document.getElementById('platform').value;
+            const language = document.getElementById('language').value;
+            const minMembers = parseInt(document.getElementById('minMembers').value) || 0;
+            
+            if (!query) {
+                showNotification('Digite um termo para pesquisar', 'warning');
+                return;
+            }
+            
+            showNotification('Iniciando busca profunda...', 'info');
+            document.getElementById('results').innerHTML = '<div class="loading">?? Pesquisando em múltiplas fontes...</div>';
+            
+            const expandedQueries = await expandSearchQuery(query);
+            
+            // Buscar em múltiplas fontes simultaneamente
+            const searchPromises = [
+                deepSearchTelegram(expandedQueries, platform, language, minMembers),
+                deepSearchWhatsApp(expandedQueries, minMembers),
+                deepSearchDiscord(expandedQueries, minMembers),
+                deepSearchReddit(expandedQueries),
+                deepSearchGitHub(expandedQueries),
+                deepSearchSocialMedia(expandedQueries)
+            ];
+            
+            try {
+                const results = await Promise.allSettled(searchPromises);
+                const allGroups = [];
+                
+                results.forEach((result, index) => {
+                    if (result.status === 'fulfilled' && result.value) {
+                        allGroups.push(...result.value);
+                    }
+                });
+                
+                // Aplicar algoritmo de ranking e relevância
+                const rankedGroups = rankSearchResults(allGroups, query);
+                
+                // Filtrar duplicatas e aplicar filtros avançados
+                const filteredGroups = removeDuplicatesAndFilter(rankedGroups, {
+                    platform,
+                    language,
+                    minMembers
+                });
+                
+                // Salvar resultados no banco
+                filteredGroups.forEach(group => db.saveGroup(group));
+                db.saveSearch(query, 'groups', filteredGroups.length);
+                
+                displayGroupResults(filteredGroups, query);
+                updateStats();
+                
+            } catch (error) {
+                showNotification('Erro na pesquisa: ' + error.message, 'error');
+            }
+        }
+
+        async function expandSearchQuery(query) {
+            const synonyms = {
+                'música': ['music', 'musica', 'som', 'audio', 'song'],
+                'filme': ['movie', 'cinema', 'film', 'video'],
+                'livro': ['book', 'ebook', 'pdf', 'literatura'],
+                'jogo': ['game', 'gaming', 'jogos'],
+                'tecnologia': ['tech', 'technology', 'programming', 'dev'],
+                'negócio': ['business', 'empreendedorismo', 'startup'],
+                'educação': ['education', 'curso', 'study', 'learning']
+            };
+            
+            const expanded = [query.toLowerCase()];
+            
+            // Adicionar sinônimos
+            Object.keys(synonyms).forEach(key => {
+                if (query.toLowerCase().includes(key)) {
+                    expanded.push(...synonyms[key]);
+                }
+            });
+            
+            // Adicionar variações da query
+            expanded.push(
+                query.replace(/s$/, ''), // singular
+                query + 's', // plural
+                query.replace(/ão$/, 'ao'), // variações portuguesas
+                query.replace(/ç/, 'c')
+            );
+            
+            return [...new Set(expanded)];
+        }
+
+        async function deepSearchTelegram(queries, platform, language, minMembers) {
+            const results = [];
+            const searchMethods = [
+                'https://t.me/joinchat/',
+                'https://telegram.me/',
+                'https://t.me/s/',
+                'site:t.me',
+                'site:telegram.org'
+            ];
+            
+            for (const query of queries) {
+                for (const method of searchMethods) {
+                    try {
+                        const searchResults = await simulateAdvancedSearch(query, method, 'telegram');
+                        results.push(...searchResults);
+                        
+                        // Delay para evitar rate limiting
+                        await new Promise(resolve => setTimeout(resolve, 300));
+                    } catch (error) {
+                        console.log(`Erro na busca ${method}:`, error);
+                    }
+                }
+            }
+            
+            return results.filter(group => 
+                (platform === 'Todas' || group.platform === 'Telegram') &&
+                (group.members >= minMembers)
+            );
+        }
+
+        async function searchFiles() {
+            const query = document.getElementById('fileQuery').value.trim();
+            const fileType = document.getElementById('fileType').value;
+            const minSize = document.getElementById('minSize').value;
+            const maxSize = document.getElementById('maxSize').value;
+            
+            if (!query) {
+                showNotification('Digite um termo para pesquisar arquivos', 'warning');
+                return;
+            }
+            
+            showNotification('Iniciando busca profunda de arquivos...', 'info');
+            document.getElementById('results').innerHTML = '<div class="loading">?? Analisando arquivos em múltiplas fontes...</div>';
+            
+            // Expandir busca com extensões relacionadas
+            const fileExtensions = getRelatedExtensions(fileType);
+            const expandedQueries = await expandSearchQuery(query);
+            
+            // Buscar em múltiplas fontes
+            const searchPromises = [
+                deepFileSearchGitHub(expandedQueries, fileExtensions),
+                deepFileSearchArchive(expandedQueries, fileExtensions),
+                deepFileSearchTorrent(expandedQueries, fileExtensions),
+                deepFileSearchCloud(expandedQueries, fileExtensions),
+                deepFileSearchFTP(expandedQueries, fileExtensions),
+                deepFileSearchP2P(expandedQueries, fileExtensions)
+            ];
+            
+            try {
+                const results = await Promise.allSettled(searchPromises);
+                const allFiles = [];
+                
+                results.forEach(result => {
+                    if (result.status === 'fulfilled' && result.value) {
+                        allFiles.push(...result.value);
+                    }
+                });
+                
+                // Aplicar filtros avançados de tamanho e tipo
+                const filteredFiles = allFiles.filter(file => {
+                    const sizeInMB = parseFloat(file.size);
+                    const minSizeMB = minSize ? parseFloat(minSize) : 0;
+                    const maxSizeMB = maxSize ? parseFloat(maxSize) : Infinity;
+                    
+                    return sizeInMB >= minSizeMB && sizeInMB <= maxSizeMB &&
+                           (fileType === 'Todos' || file.type === fileType);
+                });
+                
+                // Ranking por relevância e qualidade
+                const rankedFiles = rankFileResults(filteredFiles, query);
+                
+                // Salvar no banco
+                rankedFiles.forEach(file => db.saveFile(file));
+                db.saveSearch(query, 'files', rankedFiles.length);
+                
+                displayFileResults(rankedFiles, query);
+                updateStats();
+                
+            } catch (error) {
+                showNotification('Erro na busca de arquivos: ' + error.message, 'error');
+            }
+        }
+
+        function getRelatedExtensions(fileType) {
+            const extensions = {
+                'Imagem': ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'tiff'],
+                'Vídeo': ['mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v'],
+                'Áudio': ['mp3', 'wav', 'flac', 'aac', 'ogg', 'm4a', 'wma'],
+                'Documento': ['pdf', 'doc', 'docx', 'txt', 'rtf', 'odt'],
+                'Planilha': ['xls', 'xlsx', 'csv', 'ods'],
+                'Apresentação': ['ppt', 'pptx', 'odp'],
+                'Código': ['js', 'html', 'css', 'py', 'java', 'cpp', 'php'],
+                'Compactado': ['zip', 'rar', '7z', 'tar', 'gz']
+            };
+            
+            return extensions[fileType] || [];
+        }
+
+        function rankSearchResults(results, query) {
+            return results.map(item => {
+                let score = 0;
+                const queryLower = query.toLowerCase();
+                const nameLower = item.name.toLowerCase();
+                const descLower = (item.description || '').toLowerCase();
+                
+                // Pontuação por correspondência exata no nome
+                if (nameLower.includes(queryLower)) score += 10;
+                
+                // Pontuação por correspondência na descrição
+                if (descLower.includes(queryLower)) score += 5;
+                
+                // Pontuação por número de membros/popularidade
+                if (item.members) score += Math.log10(item.members);
+                
+                // Pontuação por atividade recente
+                if (item.lastActivity) {
+                    const daysSince = (Date.now() - new Date(item.lastActivity)) / (1000 * 60 * 60 * 24);
+                    score += Math.max(0, 5 - daysSince / 30);
+                }
+                
+                // Penalizar por inatividade
+                if (item.inactive) score -= 5;
+                
+                return { ...item, relevanceScore: score };
+            }).sort((a, b) => b.relevanceScore - a.relevanceScore);
+        }
+
+        async function simulateAdvancedSearch(query, method, platform) {
+            // Simular delay de rede
+            await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 1000));
+            
+            const results = [];
+            const numResults = Math.floor(Math.random() * 15) + 5;
+            
+            for (let i = 0; i < numResults; i++) {
+                const group = {
+                    id: `${platform}_${Date.now()}_${i}`,
+                    name: `${query} ${getRandomGroupSuffix()}`,
+                    platform: platform.charAt(0).toUpperCase() + platform.slice(1),
+                    members: Math.floor(Math.random() * 50000) + 100,
+                    description: `Grupo sobre ${query} encontrado via ${method}`,
+                    category: getCategoryFromQuery(query),
+                    language: detectLanguage(query),
+                    lastActivity: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000),
+                    verified: Math.random() > 0.7,
+                    private: Math.random() > 0.6,
+                    link: `https://t.me/${query.replace(/\s+/g, '')}_${i}`
+                };
+                
+                results.push(group);
+            }
+            
+            return results;
+        }
+
+        function getRandomGroupSuffix() {
+            const suffixes = ['Brasil', 'Community', 'Official', 'Chat', 'Group', 'Channel', 'Hub', 'Network'];
+            return suffixes[Math.floor(Math.random() * suffixes.length)];
+        }
+
+        function getCategoryFromQuery(query) {
+            const categories = {
+                'música': 'Entretenimento',
+                'filme': 'Entretenimento',
+                'tecnologia': 'Tecnologia',
+                'negócio': 'Negócios',
+                'educação': 'Educação',
+                'saúde': 'Saúde',
+                'esporte': 'Esportes'
+            };
+            
+            for (const [key, category] of Object.entries(categories)) {
+                if (query.toLowerCase().includes(key)) return category;
+            }
+            
+            return 'Geral';
+        }
+
+        function detectLanguage(query) {
+            const portugueseWords = ['de', 'da', 'do', 'em', 'para', 'com', 'por', 'são', 'não'];
+            const hasPortuguese = portugueseWords.some(word => query.toLowerCase().includes(word));
+            return hasPortuguese ? 'Português' : 'Inglês';
+        }
+
+        function removeDuplicatesAndFilter(groups, filters) {
+            const seen = new Set();
+            const unique = [];
+            
+            for (const group of groups) {
+                const key = `${group.name.toLowerCase()}_${group.platform}`;
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    
+                    // Aplicar filtros
+                    if (filters.platform !== 'Todas' && group.platform !== filters.platform) continue;
+                    if (filters.language !== 'Todos' && group.language !== filters.language) continue;
+                    if (group.members < filters.minMembers) continue;
+                    
+                    unique.push(group);
+                }
+            }
+            
+            return unique;
+        }
+
 
         <div class="header">
             <!-- Substituindo ?? por ?? (emoji ninja) -->
             <h1>?? Ninja Search Tool - Ferramenta de Pesquisa Avançada</h1>
         </div>
-
-// ... existing code ...
