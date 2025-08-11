@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Ninja - Marketing em Massa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .card-hover:hover { transform: translateY(-2px); transition: all 0.3s ease; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .notification { position: fixed; top: 20px; right: 20px; z-index: 1000; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-50 to-blue-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <div class="gradient-bg p-3 rounded-lg">
+                        <span class="text-white text-2xl">🎯</span>
+                    </div>
+                    <h1 class="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                        Group Ninja
+                    </h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">
+                        <span class="w-2 h-2 bg-green-500 rounded-full inline-block mr-2"></span>
+                        <span id="groups-found">4</span> grupos encontrados
+                    </div>
+                    <button onclick="exportData()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                        Exportar Dados
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Tabs -->
+        <div class="mb-8">
+            <div class="flex space-x-1 bg-gray-100 p-1 rounded-lg">
+                <!-- Updated tab icons from ?? to proper emojis -->
+                <button onclick="showTab('finder')" id="tab-finder" class="tab-btn flex-1 py-3 px-4 rounded-md font-medium bg-white text-purple-600 shadow-sm">
+                    🔍 Encontrar Grupos
+                </button>
+                <button onclick="showTab('selected')" id="tab-selected" class="tab-btn flex-1 py-3 px-4 rounded-md font-medium text-gray-600 hover:text-gray-900">
+                    👥 Selecionados (<span id="selected-count">0</span>)
+                </button>
+                <button onclick="showTab('sender')" id="tab-sender" class="tab-btn flex-1 py-3 px-4 rounded-md font-medium text-gray-600 hover:text-gray-900">
+                    🚀 Enviar Mensagens
+                </button>
+                <button onclick="showTab('campaigns')" id="tab-campaigns" class="tab-btn flex-1 py-3 px-4 rounded-md font-medium text-gray-600 hover:text-gray-900">
+                    📊 Campanhas
+                </button>
+            </div>
+        </div>
+
+        <!-- Finder Tab -->
+        <div id="content-finder" class="tab-content active">
+            <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+                <!-- Updated header icon from ?? to 🔍 -->
+                <h2 class="text-2xl font-bold mb-4">🔍 Descobrir Grupos Ativos</h2>
+                <p class="text-gray-600 mb-6">Encontre milhares de grupos e alcance milhões de pessoas</p>
+                
+                <div class="flex space-x-4 mb-6">
+                    <input type="text" id="search-input" placeholder="Ex: empreendedorismo, marketing, vendas..." class="flex-1 px-4 py-3 border border-gray-300 rounded-lg" oninput="handleSearchInput()">
+                    <button onclick="searchGroups()" class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700">Buscar</button>
+                </div>
+
+                <!-- Platform Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <!-- Updated WhatsApp icon from ?? to 💬 -->
+                        <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white text-xl mx-auto mb-2">💬</div>
+                        <div class="font-medium">WhatsApp</div>
+                        <div class="text-sm text-gray-600">450+ grupos</div>
+                    </div>
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <!-- Updated Telegram icon from ?? to ✈️ -->
+                        <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white text-xl mx-auto mb-2">✈️</div>
+                        <div class="font-medium">Telegram</div>
+                        <div class="text-sm text-gray-600">320+ grupos</div>
+                    </div>
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <!-- Updated Instagram icon from ?? to 📷 -->
+                        <div class="w-12 h-12 bg-pink-500 rounded-full flex items-center justify-center text-white text-xl mx-auto mb-2">📷</div>
+                        <div class="font-medium">Instagram</div>
+                        <div class="text-sm text-gray-600">280+ grupos</div>
+                    </div>
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <!-- Updated Facebook icon from ?? to 👥 -->
+                        <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white text-xl mx-auto mb-2">👥</div>
+                        <div class="font-medium">Facebook</div>
+                        <div class="text-sm text-gray-600">190+ grupos</div>
+                    </div>
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <!-- Updated Discord icon from ?? to 🎮 -->
+                        <div class="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center text-white text-xl mx-auto mb-2">🎮</div>
+                        <div class="font-medium">Discord</div>
+                        <div class="text-sm text-gray-600">150+ grupos</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Groups List -->
+            <div id="groups-container">
+                <h3 class="text-xl font-bold mb-4">Grupos Encontrados (<span id="groups-count">4</span>)</h3>
+                <div id="groups-list" class="space-y-4">
+                    <!-- Groups will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Selected Tab -->
+        <div id="content-selected" class="tab-content">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h2 class="text-2xl font-bold mb-4">Grupos Selecionados</h2>
+                <p class="text-gray-600 mb-6" id="selected-summary">0 grupos selecionados • 0 membros no total</p>
+                <div id="selected-list">
+                    <div class="text-center py-12 text-gray-500">
+                        <div class="text-6xl mb-4">👥</div>
+                        <p class="text-lg">Nenhum grupo selecionado ainda</p>
+                        <p>Vá para "Encontrar Grupos" e selecione os grupos desejados</p>
+                    </div>
+                </div>
+                <div id="continue-section" class="hidden pt-6 border-t">
+                    <div class="flex justify-between items-center">
+                        <div class="text-gray-600">
+                            Alcance total estimado: <strong id="total-reach">0 pessoas</strong>
+                        </div>
+                        <button onclick="showTab('sender')" class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700">
+                            Continuar para Envio
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sender Tab -->
+        <div id="content-sender" class="tab-content">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h2 class="text-2xl font-bold mb-4">Envio em Massa</h2>
+                <p class="text-gray-600 mb-6">
+                    Envie sua mensagem para <span id="sender-total">0</span> pessoas em <span id="sender-groups">0</span> grupos
+                </p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Título da Campanha</label>
+                            <input type="text" id="campaign-title" placeholder="Ex: Lançamento do Meu Produto Incrível" class="w-full px-4 py-3 border border-gray-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Sua Mensagem</label>
+                            <textarea id="campaign-message" placeholder="🔥 NOVIDADE IMPERDÍVEL! 
+
+Acabei de lançar algo que vai REVOLUCIONAR sua vida!
+
+✨ Benefícios únicos que você nunca viu
+💰 Preço especial só hoje  
+🎁 Bônus exclusivos para os primeiros
+
+👉 Clique aqui: [SEU LINK]
+
+#NovoLançamento #Oportunidade" rows="10" class="w-full px-4 py-3 border border-gray-300 rounded-lg"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-lg">
+                            <h4 class="font-semibold mb-4">Previsão de Resultados</h4>
+                            <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span>Mensagens enviadas:</span>
+                                    <span class="font-bold" id="prediction-sent">0</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Taxa de entrega estimada:</span>
+                                    <span class="font-bold text-green-600">95%</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Visualizações esperadas:</span>
+                                    <span class="font-bold text-blue-600" id="prediction-views">0</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Cliques estimados:</span>
+                                    <span class="font-bold text-purple-600" id="prediction-clicks">0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                            <div class="flex items-start space-x-2">
+                                <span class="text-yellow-600 text-xl">⚠️</span>
+                                <div>
+                                    <h5 class="font-medium text-yellow-800">Dicas para Melhor Performance</h5>
+                                    <ul class="text-sm text-yellow-700 mt-2 space-y-1">
+                                        <li>• Use emojis para chamar atenção</li>
+                                        <li>• Inclua call-to-action claro</li>
+                                        <li>• Mantenha a mensagem concisa</li>
+                                        <li>• Teste diferentes horários</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center pt-8 border-t">
+                    <div class="text-gray-600">Tempo estimado de envio: <strong>3-5 minutos</strong></div>
+                    <div class="flex space-x-3">
+                        <button onclick="scheduleCampaign()" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">Agendar Envio</button>
+                        <button onclick="sendCampaign()" id="send-btn" class="px-8 py-3 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed">
+                            Enviar Agora
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Campaigns Tab -->
+        <div id="content-campaigns" class="tab-content">
+            <div class="space-y-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold">Suas Campanhas</h2>
+                    <button onclick="showTab('finder')" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
+                        Nova Campanha
+                    </button>
+                </div>
+
+                <div id="campaigns-list">
+                    <!-- Campaigns will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification hidden">
+        <div class="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg">
+            <span id="notification-text"></span>
+        </div>
+    </div>
+
+    <script>
+        // Data storage
+        let selectedGroups = [];
+        let allGroups = [
+            // Negócios e Empreendedorismo
+            { id: 1, name: "Empreendedores Brasil", members: 15420, platform: "whatsapp", category: "Negócios", engagement: "Alto", verified: true, hasContacts: true, hasMedia: false },
+            { id: 2, name: "Marketing Digital Pro", members: 8900, platform: "telegram", category: "Marketing", engagement: "Médio", verified: true, hasContacts: true, hasMedia: true },
+            { id: 3, name: "Vendas Online Brasil", members: 12300, platform: "whatsapp", category: "Vendas", engagement: "Alto", verified: false, hasContacts: true, hasMedia: false },
+            { id: 4, name: "Influencers Network", members: 25600, platform: "instagram", category: "Influência", engagement: "Muito Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 5, name: "E-commerce Masters", members: 18750, platform: "whatsapp", category: "E-commerce", engagement: "Alto", verified: true, hasContacts: true, hasMedia: false },
+            { id: 6, name: "Dropshipping Brasil", members: 9800, platform: "telegram", category: "Dropshipping", engagement: "Médio", verified: false, hasContacts: true, hasMedia: true },
+            { id: 7, name: "Afiliados Premium", members: 22100, platform: "whatsapp", category: "Afiliados", engagement: "Alto", verified: true, hasContacts: true, hasMedia: false },
+            { id: 8, name: "Crypto Traders BR", members: 31200, platform: "telegram", category: "Crypto", engagement: "Muito Alto", verified: true, hasContacts: true, hasMedia: true },
+            
+            // Moda e Modelagem
+            { id: 9, name: "Modelos Brasil", members: 34500, platform: "instagram", category: "Modelagem", engagement: "Muito Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 10, name: "Fashion Week BR", members: 28900, platform: "instagram", category: "Moda", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 11, name: "Roupas Femininas", members: 45600, platform: "whatsapp", category: "Moda", engagement: "Alto", verified: false, hasContacts: true, hasMedia: true },
+            { id: 12, name: "Moda Masculina", members: 23400, platform: "telegram", category: "Moda", engagement: "Médio", verified: true, hasContacts: true, hasMedia: true },
+            { id: 13, name: "Plus Size Fashion", members: 19800, platform: "instagram", category: "Moda", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 14, name: "Moda Infantil", members: 16700, platform: "whatsapp", category: "Moda", engagement: "Médio", verified: false, hasContacts: true, hasMedia: true },
+            { id: 15, name: "Sapatos e Acessórios", members: 21300, platform: "telegram", category: "Moda", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 16, name: "Modelos Fotográficos", members: 18900, platform: "instagram", category: "Modelagem", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 17, name: "Casting Modelos", members: 12400, platform: "whatsapp", category: "Modelagem", engagement: "Médio", verified: true, hasContacts: true, hasMedia: false },
+            { id: 18, name: "Moda Praia", members: 25600, platform: "instagram", category: "Moda", engagement: "Alto", verified: false, hasContacts: true, hasMedia: true },
+            
+            // Reggae e Roots
+            { id: 19, name: "Reggae Brasil", members: 8500, platform: "whatsapp", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 65, name: "Reggae Roots Brasil", members: 12300, platform: "whatsapp", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 66, name: "Reggae Roots Underground", members: 6800, platform: "telegram", category: "Música", engagement: "Médio", verified: false, hasContacts: true, hasMedia: true },
+            { id: 67, name: "Roots & Culture BR", members: 9500, platform: "whatsapp", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 68, name: "Reggae Roots Clássico", members: 7200, platform: "instagram", category: "Música", engagement: "Médio", verified: true, hasContacts: true, hasMedia: true },
+            { id: 69, name: "One Love Reggae Roots", members: 11800, platform: "whatsapp", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 70, name: "Jah Bless Reggae", members: 5600, platform: "telegram", category: "Música", engagement: "Médio", verified: false, hasContacts: true, hasMedia: true },
+            { id: 71, name: "Reggae Roots Rasta", members: 8900, platform: "whatsapp", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 72, name: "Bob Marley Tribute BR", members: 15600, platform: "instagram", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 73, name: "Reggae Dub Brasil", members: 4300, platform: "telegram", category: "Música", engagement: "Médio", verified: false, hasContacts: true, hasMedia: true },
+            { id: 74, name: "Rastafari Music BR", members: 7800, platform: "whatsapp", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 75, name: "Reggae Dancehall BR", members: 9200, platform: "instagram", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            
+            // New Reggae Subgenres and Styles
+            { id: 151, name: "Reggae Ska Brasil", members: 6400, platform: "whatsapp", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 152, name: "Reggae Rocksteady BR", members: 5200, platform: "telegram", category: "Música", engagement: "Médio", verified: false, hasContacts: true, hasMedia: true },
+            { id: 153, name: "Reggae Lovers Rock BR", members: 8700, platform: "instagram", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 154, name: "Reggae Digital Brasil", members: 7300, platform: "whatsapp", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 155, name: "Reggae Fusion BR", members: 9800, platform: "instagram", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 156, name: "Reggae Pop Brasil", members: 12500, platform: "whatsapp", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 157, name: "Reggae Rock BR", members: 6900, platform: "telegram", category: "Música", engagement: "Médio", verified: false, hasContacts: true, hasMedia: true },
+            { id: 158, name: "Reggae Jazz Fusion", members: 4800, platform: "instagram", category: "Música", engagement: "Médio", verified: true, hasContacts: true, hasMedia: true },
+            { id: 159, name: "Reggae Eletrônico BR", members: 8100, platform: "whatsapp", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 160, name: "Reggae Acústico Brasil", members: 5700, platform: "instagram", category: "Música", engagement: "Médio", verified: true, hasContacts: true, hasMedia: true },
+            { id: 161, name: "Reggae Gospel BR", members: 11200, platform: "whatsapp", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 162, name: "Reggae Instrumental", members: 4500, platform: "telegram", category: "Música", engagement: "Médio", verified: false, hasContacts: true, hasMedia: true },
+            { id: 163, name: "Reggae Vintage Brasil", members: 6800, platform: "instagram", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 164, name: "Reggae Conscious BR", members: 9400, platform: "whatsapp", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 165, name: "Reggae Steppers BR", members: 5300, platform: "telegram", category: "Música", engagement: "Médio", verified: false, hasContacts: true, hasMedia: true },
+            { id: 166, name: "Reggae Nyabinghi BR", members: 3900, platform: "whatsapp", category: "Música", engagement: "Médio", verified: true, hasContacts: true, hasMedia: true },
+            { id: 167, name: "Reggae One Drop BR", members: 7600, platform: "instagram", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 168, name: "Reggae Rubadub Brasil", members: 4200, platform: "telegram", category: "Música", engagement: "Médio", verified: false, hasContacts: true, hasMedia: true },
+            { id: 169, name: "Reggae Ragga BR", members: 8300, platform: "whatsapp", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 170, name: "Reggae Bashment BR", members: 6100, platform: "instagram", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 171, name: "Reggae Jungle BR", members: 5800, platform: "telegram", category: "Música", engagement: "Médio", verified: false, hasContacts: true, hasMedia: true },
+            { id: 172, name: "Reggae Dubstep Brasil", members: 7900, platform: "whatsapp", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 173, name: "Reggae Trap BR", members: 10500, platform: "instagram", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 174, name: "Reggae Hip Hop BR", members: 9700, platform: "whatsapp", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 175, name: "Reggae Samba BR", members: 8600, platform: "instagram", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 176, name: "Reggae Forró Brasil", members: 7400, platform: "whatsapp", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 177, name: "Reggae MPB Brasil", members: 6700, platform: "telegram", category: "Música", engagement: "Médio", verified: false, hasContacts: true, hasMedia: true },
+            { id: 178, name: "Reggae Bossa Nova", members: 5100, platform: "instagram", category: "Música", engagement: "Médio", verified: true, hasContacts: true, hasMedia: true },
+            { id: 179, name: "Reggae Axé Brasil", members: 9300, platform: "whatsapp", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 180, name: "Reggae Pagode BR", members: 8800, platform: "instagram", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            
+            // Rock e Metal
+            { id: 20, name: "Rock Nacional", members: 12400, platform: "telegram", category: "Música", engagement: "Médio", verified: true, hasContacts: true, hasMedia: true },
+            { id: 76, name: "Rock Clássico Brasil", members: 18900, platform: "whatsapp", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 77, name: "Heavy Metal BR", members: 14500, platform: "telegram", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 78, name: "Punk Rock Brasil", members: 6700, platform: "instagram", category: "Música", engagement: "Médio", verified: false, hasContacts: true, hasMedia: true },
+            { id: 79, name: "Rock Alternativo", members: 11200, platform: "whatsapp", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 80, name: "Death Metal Underground", members: 3800, platform: "telegram", category: "Música", engagement: "Médio", verified: false, hasContacts: true, hasMedia: true },
+            
+            // Funk e Hip Hop
+            { id: 21, name: "Funk Carioca", members: 19800, platform: "whatsapp", category: "Música", engagement: "Alto", verified: false, hasContacts: true, hasMedia: true },
+            { id: 23, name: "Hip Hop Underground", members: 7600, platform: "telegram", category: "Música", engagement: "Médio", verified: false, hasContacts: true, hasMedia: true },
+            { id: 81, name: "Funk Ostentação", members: 25600, platform: "instagram", category: "Música", engagement: "Muito Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 82, name: "Rap Nacional", members: 16800, platform: "whatsapp", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 83, name: "Trap Brasil", members: 22400, platform: "instagram", category: "Música", engagement: "Muito Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 84, name: "Funk Melody", members: 18300, platform: "whatsapp", category: "Música", engagement: "Alto", verified: false, hasContacts: true, hasMedia: true },
+            { id: 85, name: "Hip Hop Consciente", members: 9500, platform: "telegram", category: "Música", engagement: "Médio", verified: true, hasContacts: true, hasMedia: true },
+            
+            // Sertanejo e Country
+            { id: 22, name: "Sertanejo Universitário", members: 28900, platform: "instagram", category: "Música", engagement: "Muito Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 86, name: "Sertanejo Raiz", members: 21700, platform: "whatsapp", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 87, name: "Sertanejo Romântico", members: 34500, platform: "instagram", category: "Música", engagement: "Muito Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 88, name: "Country Brasil", members: 8900, platform: "telegram", category: "Música", engagement: "Médio", verified: false, hasContacts: true, hasMedia: true },
+            { id: 89, name: "Modão de Viola", members: 12600, platform: "whatsapp", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            
+            // Forró e Nordestino
+            { id: 90, name: "Forró Pé de Serra", members: 15400, platform: "whatsapp", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 91, name: "Forró Eletrônico", members: 19800, platform: "instagram", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 92, name: "Xote e Baião", members: 8700, platform: "telegram", category: "Música", engagement: "Médio", verified: false, hasContacts: true, hasMedia: true },
+            { id: 93, name: "Piseiro Brasil", members: 28600, platform: "instagram", category: "Música", engagement: "Muito Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 94, name: "Arrocha Bahia", members: 16200, platform: "whatsapp", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            
+            // Pagode e Samba
+            { id: 95, name: "Pagode Raiz", members: 22100, platform: "whatsapp", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 96, name: "Samba de Roda", members: 9800, platform: "telegram", category: "Música", engagement: "Médio", verified: true, hasContacts: true, hasMedia: true },
+            { id: 97, name: "Pagode 90s", members: 18500, platform: "instagram", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 98, name: "Samba Enredo", members: 7300, platform: "whatsapp", category: "Música", engagement: "Médio", verified: false, hasContacts: true, hasMedia: true },
+            
+            // MPB e Bossa Nova
+            { id: 99, name: "MPB Clássica", members: 14600, platform: "telegram", category: "Música", engagement: "Médio", verified: true, hasContacts: true, hasMedia: true },
+            { id: 100, name: "Bossa Nova Brasil", members: 11200, platform: "instagram", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 101, name: "MPB Contemporânea", members: 16800, platform: "whatsapp", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 102, name: "Música Popular Brasileira", members: 13400, platform: "telegram", category: "Música", engagement: "Médio", verified: true, hasContacts: true, hasMedia: true },
+            
+            // Eletrônica e Dance
+            { id: 103, name: "Eletrônica Brasil", members: 19600, platform: "instagram", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 104, name: "House Music BR", members: 12800, platform: "telegram", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 105, name: "Techno Underground", members: 8400, platform: "whatsapp", category: "Música", engagement: "Médio", verified: false, hasContacts: true, hasMedia: true },
+            { id: 106, name: "Trance Brasil", members: 6900, platform: "telegram", category: "Música", engagement: "Médio", verified: true, hasContacts: true, hasMedia: true },
+            { id: 107, name: "EDM Brasil", members: 21500, platform: "instagram", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            
+            // Jazz e Blues
+            { id: 108, name: "Jazz Brasil", members: 7800, platform: "telegram", category: "Música", engagement: "Médio", verified: true, hasContacts: true, hasMedia: true },
+            { id: 109, name: "Blues Nacional", members: 5600, platform: "whatsapp", category: "Música", engagement: "Médio", verified: false, hasContacts: true, hasMedia: true },
+            { id: 110, name: "Jazz Fusion BR", members: 4200, platform: "instagram", category: "Música", engagement: "Baixo", verified: true, hasContacts: true, hasMedia: true },
+            
+            // Gospel e Religioso
+            { id: 111, name: "Música Gospel", members: 32400, platform: "whatsapp", category: "Música", engagement: "Muito Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 112, name: "Gospel Contemporâneo", members: 28700, platform: "instagram", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 113, name: "Louvor e Adoração", members: 41200, platform: "whatsapp", category: "Música", engagement: "Muito Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 114, name: "Gospel Rap", members: 15600, platform: "telegram", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            
+            // Pop e Internacional
+            { id: 115, name: "Pop Nacional", members: 26800, platform: "instagram", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 116, name: "Pop Rock Brasil", members: 18900, platform: "whatsapp", category: "Música", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 117, name: "Indie Brasil", members: 9700, platform: "telegram", category: "Música", engagement: "Médio", verified: false, hasContacts: true, hasMedia: true },
+            { id: 118, name: "K-Pop Brasil", members: 45600, platform: "instagram", category: "Música", engagement: "Muito Alto", verified: true, hasContacts: true, hasMedia: true },
+            
+            // Beleza e Estética
+            { id: 119, name: "Maquiagem Profissional", members: 38900, platform: "instagram", category: "Beleza", engagement: "Muito Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 120, name: "Cabelos e Penteados", members: 42300, platform: "whatsapp", category: "Beleza", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 121, name: "Unhas Decoradas", members: 35600, platform: "instagram", category: "Beleza", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 122, name: "Skincare Brasil", members: 29800, platform: "telegram", category: "Beleza", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 123, name: "Estética Corporal", members: 21400, platform: "whatsapp", category: "Beleza", engagement: "Médio", verified: true, hasContacts: true, hasMedia: true },
+            
+            // Fitness e Saúde
+            { id: 124, name: "Musculação Brasil", members: 56700, platform: "instagram", category: "Fitness", engagement: "Muito Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 125, name: "Crossfit Comunidade", members: 23400, platform: "whatsapp", category: "Fitness", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 126, name: "Yoga e Meditação", members: 18900, platform: "telegram", category: "Fitness", engagement: "Médio", verified: true, hasContacts: true, hasMedia: true },
+            { id: 127, name: "Corrida e Maratona", members: 31200, platform: "instagram", category: "Fitness", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 128, name: "Dieta e Nutrição", members: 44500, platform: "whatsapp", category: "Fitness", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            
+            // Culinária
+            { id: 129, name: "Receitas Caseiras", members: 67800, platform: "whatsapp", category: "Culinária", engagement: "Muito Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 130, name: "Doces e Sobremesas", members: 52300, platform: "instagram", category: "Culinária", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 131, name: "Churrasco Brasil", members: 38600, platform: "telegram", category: "Culinária", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 132, name: "Comida Vegana", members: 24700, platform: "whatsapp", category: "Culinária", engagement: "Médio", verified: true, hasContacts: true, hasMedia: true },
+            { id: 133, name: "Gastronomia Gourmet", members: 19800, platform: "instagram", category: "Culinária", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            
+            // Tecnologia
+            { id: 134, name: "Programação Brasil", members: 45600, platform: "telegram", category: "Tecnologia", engagement: "Alto", verified: true, hasContacts: true, hasMedia: false },
+            { id: 135, name: "Android Developers", members: 28900, platform: "whatsapp", category: "Tecnologia", engagement: "Médio", verified: true, hasContacts: true, hasMedia: false },
+            { id: 136, name: "Web Design", members: 34200, platform: "instagram", category: "Tecnologia", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 137, name: "Inteligência Artificial", members: 21500, platform: "telegram", category: "Tecnologia", engagement: "Alto", verified: true, hasContacts: true, hasMedia: false },
+            { id: 138, name: "Gadgets e Tech", members: 39800, platform: "whatsapp", category: "Tecnologia", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            
+            // Esportes
+            { id: 139, name: "Futebol Brasil", members: 89600, platform: "whatsapp", category: "Esportes", engagement: "Muito Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 140, name: "Vôlei de Praia", members: 23400, platform: "instagram", category: "Esportes", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 141, name: "Basquete Nacional", members: 18700, platform: "telegram", category: "Esportes", engagement: "Médio", verified: true, hasContacts: true, hasMedia: true },
+            { id: 142, name: "MMA Brasil", members: 34500, platform: "whatsapp", category: "Esportes", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 143, name: "Surf Brasil", members: 26800, platform: "instagram", category: "Esportes", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            
+            // Games
+            { id: 144, name: "Free Fire Brasil", members: 78900, platform: "whatsapp", category: "Games", engagement: "Muito Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 145, name: "FIFA Players BR", members: 45600, platform: "telegram", category: "Games", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 146, name: "Mobile Legends", members: 56700, platform: "instagram", category: "Games", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 147, name: "Fortnite Brasil", members: 67800, platform: "whatsapp", category: "Games", engagement: "Muito Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 148, name: "Call of Duty Mobile", members: 52300, platform: "telegram", category: "Games", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            
+            // Animais
+            { id: 149, name: "Cachorros Brasil", members: 43200, platform: "whatsapp", category: "Animais", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true },
+            { id: 150, name: "Gatos do Brasil", members: 38900, platform: "instagram", category: "Animais", engagement: "Alto", verified: true, hasContacts: true, hasMedia: true }
+        ];
+
+        const platformColors = {
+            whatsapp: 'bg-green-500',
+            telegram: 'bg-blue-500',
+            instagram: 'bg-pink-500',
+            facebook: 'bg-blue-600',
+            discord: 'bg-indigo-500'
+        };
+
+        const platformEmojis = {
+            whatsapp: '💬',
+            telegram: '✈️',
+            instagram: '📷',
+            facebook: '👥',
+            discord: '🎮'
+        };
+
+        const engagementColors = {
+            'Alto': 'green',
+            'Médio': 'blue',
+            'Baixo': 'red',
+            'Muito Alto': 'purple'
+        };
+
+        function extractMedia(groupId) {
+            const group = allGroups.find(g => g.id === groupId);
+            if (!group) return;
+            
+            if (!group.hasMedia) {
+                showNotification(`❌ Grupo "${group.name}" não possui mídias disponíveis`);
+                return;
+            }
+
+            if (group.isPrivate) {
+                showNotification(`🔒 Grupo "${group.name}" é privado. Tentando entrar primeiro...`);
+                joinGroup(groupId, () => {
+                    setTimeout(() => {
+                        extractMediaFromGroup(groupId, true);
+                    }, 2000);
+                });
+                return;
+            } else {
+                extractMediaFromGroup(groupId, false);
+            }
+        }
+
+        function extractMediaFromGroup(groupId, isPrivateGroup) {
+            const group = allGroups.find(g => g.id === groupId);
+            if (!group) return;
+            
+            const accessType = isPrivateGroup ? "após entrar no grupo privado" : "do grupo público";
+            showNotification(`🔄 Extraindo mídias ${accessType} "${group.name}"...`);
+            
+            setTimeout(() => {
+                const baseMediaCount = isPrivateGroup ? 300 : 150;
+                const mediaCount = Math.floor(Math.random() * baseMediaCount) + (isPrivateGroup ? 200 : 100);
+                const mediaList = [];
+                
+                const musicFiles = ['MP3', 'WAV', 'FLAC', 'M4A', 'OGG'];
+                const videoFiles = ['MP4', 'AVI', 'MOV', 'MKV', 'WMV', '3GP'];
+                const imageFiles = ['JPG', 'PNG', 'GIF', 'WEBP', 'BMP'];
+                const documentFiles = ['PDF', 'DOC', 'DOCX', 'TXT'];
+                
+                for (let i = 0; i < mediaCount; i++) {
+                    let mediaType, extension, size;
+                    
+                    const platformMultiplier = getPlatformMediaMultiplier(group.platform);
+                    const rand = Math.random();
+                    
+                    if (group.category === 'Música') {
+                        if (rand < 0.6) {
+                            mediaType = 'Áudio';
+                            extension = musicFiles[Math.floor(Math.random() * musicFiles.length)];
+                            size = `${(Math.random() * 12 + 3).toFixed(1)}MB`;
+                        } else if (rand < 0.85) {
+                            mediaType = 'Vídeo';
+                            extension = videoFiles[Math.floor(Math.random() * videoFiles.length)];
+                            size = `${(Math.random() * 80 + 15).toFixed(1)}MB`;
+                        } else {
+                            mediaType = 'Imagem';
+                            extension = imageFiles[Math.floor(Math.random() * imageFiles.length)];
+                            size = `${(Math.random() * 3 + 0.8).toFixed(1)}MB`;
+                        }
+                    } else if (group.category === 'Moda' || group.category === 'Modelagem') {
+                        if (rand < 0.7) {
+                            mediaType = 'Imagem';
+                            extension = imageFiles[Math.floor(Math.random() * imageFiles.length)];
+                            size = `${(Math.random() * 8 + 2).toFixed(1)}MB`;
+                        } else if (rand < 0.95) {
+                            mediaType = 'Vídeo';
+                            extension = videoFiles[Math.floor(Math.random() * videoFiles.length)];
+                            size = `${(Math.random() * 50 + 10).toFixed(1)}MB`;
+                        } else {
+                            mediaType = 'Documento';
+                            extension = documentFiles[Math.floor(Math.random() * documentFiles.length)];
+                            size = `${(Math.random() * 2 + 0.5).toFixed(1)}MB`;
+                        }
+                    } else {
+                        if (rand < 0.5) {
+                            mediaType = 'Imagem';
+                            extension = imageFiles[Math.floor(Math.random() * imageFiles.length)];
+                            size = `${(Math.random() * 6 + 1).toFixed(1)}MB`;
+                        } else if (rand < 0.8) {
+                            mediaType = 'Vídeo';
+                            extension = videoFiles[Math.floor(Math.random() * videoFiles.length)];
+                            size = `${(Math.random() * 60 + 8).toFixed(1)}MB`;
+                        } else if (rand < 0.9) {
+                            mediaType = 'Áudio';
+                            extension = musicFiles[Math.floor(Math.random() * musicFiles.length)];
+                            size = `${(Math.random() * 10 + 2).toFixed(1)}MB`;
+                        } else {
+                            mediaType = 'Documento';
+                            extension = documentFiles[Math.floor(Math.random() * documentFiles.length)];
+                            size = `${(Math.random() * 3 + 0.3).toFixed(1)}MB`;
+                        }
+                    }
+                    
+                    mediaList.push({
+                        type: mediaType,
+                        name: `${group.name.replace(/\s+/g, '_')}_${group.platform}_${String(i + 1).padStart(4, '0')}.${extension.toLowerCase()}`,
+                        size: size,
+                        platform: group.platform,
+                        extracted: new Date().toLocaleString('pt-BR')
+                    });
+                }
+                
+                const totalSize = Math.floor(mediaList.reduce((sum, m) => sum + parseFloat(m.size), 0));
+                
+                const zipContent = createZipFile(mediaList, group.name, isPrivateGroup);
+                const zipBlob = new Blob([zipContent], { type: 'application/zip' });
+                const zipUrl = URL.createObjectURL(zipBlob);
+                
+                const accessSuffix = isPrivateGroup ? "_PRIVADO" : "_PUBLICO";
+                const zipLink = document.createElement("a");
+                zipLink.setAttribute("href", zipUrl);
+                zipLink.setAttribute("download", `${group.name.replace(/\s+/g, '_')}_${group.platform.toUpperCase()}_MIDIAS${accessSuffix}_${mediaCount}_ARQUIVOS_${totalSize}MB.zip`);
+                document.body.appendChild(zipLink);
+                zipLink.click();
+                document.body.removeChild(zipLink);
+                
+                URL.revokeObjectURL(zipUrl);
+                
+                const successMessage = isPrivateGroup ? 
+                    `✅ ZIP baixado! ${mediaCount} arquivos (${totalSize}MB) extraídos do grupo privado ${group.name}` :
+                    `✅ ZIP baixado! ${mediaCount} arquivos (${totalSize}MB) do grupo público ${group.name}`;
+                showNotification(successMessage);
+                
+                const button = document.querySelector(`button[onclick="extractMedia(${groupId})"]`);
+                if (button) {
+                    button.innerHTML = '✅ ZIP Baixado';
+                    button.style.backgroundColor = '#10b981';
+                    button.disabled = true;
+                }
+            }, isPrivateGroup ? 5000 : 3000);
+        }
+
+        function getPlatformMediaMultiplier(platform) {
+            const multipliers = {
+                'whatsapp': 1.2,
+                'telegram': 1.5,
+                'instagram': 1.8,
+                'facebook': '1.3',
+                'discord': '1.4'
+            };
+            return multipliers[platform] || 1.0;
+        }
+
+        function createZipFile(mediaList, groupName, isPrivateGroup = false) {
+            // Create a simple ZIP file structure with file entries
+            let zipContent = '';
+            
+            // ZIP file header
+            zipContent += 'PK\x03\x04'; // Local file header signature
+            zipContent += '\x14\x00'; // Version needed to extract
+            zipContent += '\x00\x00'; // General purpose bit flag
+            zipContent += '\x00\x00'; // Compression method (stored)
+            zipContent += '\x00\x00'; // Last mod file time
+            zipContent += '\x00\x00'; // Last mod file date
+            zipContent += '\x00\x00\x00\x00'; // CRC-32
+            zipContent += '\x00\x00\x00\x00'; // Compressed size
+            zipContent += '\x00\x00\x00\x00'; // Uncompressed size
+            
+            // Create a text file with media list
+            const fileContent = `MÍDIA EXTRAÍDA DO GRUPO: ${groupName}\n\n` +
+                               `Total de arquivos: ${mediaList.length}\n\n` +
+                               `LISTA DE ARQUIVOS:\n` +
+                               mediaList.map(m => `${m.name} (${m.size})`).join('\n');
+            
+            const fileName = `${groupName.replace(/\s+/g, '_')}_LISTA_MIDIAS.txt`;
+            const fileNameLength = fileName.length;
+            
+            zipContent += String.fromCharCode(fileNameLength & 0xFF, (fileNameLength >> 8) & 0xFF); // File name length
+            zipContent += '\x00\x00'; // Extra field length
+            zipContent += fileName; // File name
+            zipContent += fileContent; // File content
+            
+            // Central directory
+            zipContent += 'PK\x01\x02'; // Central directory file header signature
+            zipContent += '\x14\x00'; // Version made by
+            zipContent += '\x14\x00'; // Version needed to extract
+            zipContent += '\x00\x00'; // General purpose bit flag
+            zipContent += '\x00\x00'; // Compression method
+            zipContent += '\x00\x00'; // Last mod file time
+            zipContent += '\x00\x00'; // Last mod file date
+            zipContent += '\x00\x00\x00\x00'; // CRC-32
+            zipContent += String.fromCharCode(fileContent.length & 0xFF, (fileContent.length >> 8) & 0xFF, 0, 0); // Compressed size
+            zipContent += String.fromCharCode(fileContent.length & 0xFF, (fileContent.length >> 8) & 0xFF, 0, 0); // Uncompressed size
+            zipContent += String.fromCharCode(fileNameLength & 0xFF, (fileNameLength >> 8) & 0xFF); // File name length
+            zipContent += '\x00\x00'; // Extra field length
+            zipContent += '\x00\x00'; // File comment length
+            zipContent += '\x00\x00'; // Disk number start
+            zipContent += '\x00\x00'; // Internal file attributes
+            zipContent += '\x00\x00\x00\x00'; // External file attributes
+            zipContent += '\x00\x00\x00\x00'; // Relative offset of local header
+            zipContent += fileName; // File name
+            
+            // End of central directory
+            zipContent += 'PK\x05\x06'; // End of central directory signature
+            zipContent += '\x00\x00'; // Number of this disk
+            zipContent += '\x00\x00'; // Number of the disk with the start of the central directory
+            zipContent += '\x01\x00'; // Total number of entries in the central directory on this disk
+            zipContent += '\x01\x00'; // Total number of entries in the central directory
+            
+            const centralDirSize = 46 + fileNameLength;
+            zipContent += String.fromCharCode(centralDirSize & 0xFF, (centralDirSize >> 8) & 0xFF, 0, 0); // Size of central directory
+            
+            const centralDirOffset = 30 + fileNameLength + fileContent.length;
+            zipContent += String.fromCharCode(centralDirOffset & 0xFF, (centralDirOffset >> 8) & 0xFF, 0, 0); // Offset of start of central directory
+            zipContent += '\x00\x00'; // ZIP file comment length
+            
+            return zipContent;
+        }
+
+        function handleSearchInput() {
+            const searchInput = document.getElementById('search-input').value.toLowerCase();
+            if (searchInput === '') {
+                // Show all groups when search is cleared
+                renderAllGroups();
+            }
+        }
+
+        function renderAllGroups() {
+            const groupsList = document.getElementById('groups-list');
+            groupsList.innerHTML = '';
+
+            allGroups.forEach(group => {
+                const platformColor = platformColors[group.platform];
+                const platformEmoji = platformEmojis[group.platform];
+                const engagementColor = engagementColors[group.engagement];
+
+                const groupElement = document.createElement('div');
+                groupElement.className = 'bg-white rounded-lg shadow-sm p-6 mb-6 card-hover group-item';
+                groupElement.setAttribute('data-id', group.id);
+                groupElement.innerHTML = `
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-4">
+                            <input type="checkbox" class="group-checkbox w-5 h-5 text-purple-600" data-id="${group.id}" data-members="${group.members}">
+                            <div class="w-12 h-12 ${platformColor} rounded-full flex items-center justify-center text-white text-xl">${platformEmoji}</div>
+                            <div>
+                                <h4 class="text-lg font-semibold flex items-center">
+                                    ${group.name}
+                                    ${group.verified ? '<span class="text-blue-500 ml-2">✓</span>' : ''}
+                                </h4>
+                                <div class="flex items-center space-x-4 text-sm text-gray-600">
+                                    <span class="bg-gray-100 px-2 py-1 rounded">${group.category}</span>
+                                    <span>👥 ${group.members.toLocaleString()} membros</span>
+                                    <span class="text-${engagementColor}-600">📈 ${group.engagement}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-2 mb-4">
+                        ${group.hasMedia ? 
+                            `<button onclick="extractMedia(${group.id})" class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 text-sm">
+                                📁 Baixar Mídia
+                            </button>` : 
+                            `<button class="bg-gray-300 text-gray-500 px-3 py-2 rounded-lg cursor-not-allowed text-sm">
+                                📁 Sem Mídia
+                            </button>`
+                        }
+                        ${group.hasContacts ? 
+                            `<button onclick="viewMembers(${group.id})" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 text-sm">
+                                👥 Ver Membros
+                            </button>` : 
+                            `<button class="bg-gray-300 text-gray-500 px-3 py-2 rounded-lg cursor-not-allowed text-sm">
+                                👥 Sem Contatos
+                            </button>`
+                        }
+                        <button onclick="joinGroup(${group.id})" class="bg-orange-600 text-white px-3 py-2 rounded-lg hover:bg-orange-700 text-sm">
+                            🚀 Entrar no Grupo
+                        </button>
+                    </div>
+                    
+                    <div class="flex justify-end">
+                        <button onclick="selectGroup(${group.id})" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                            Selecionar
+                        </button>
+                    </div>
+                `;
+                groupsList.appendChild(groupElement);
+            });
+
+            document.getElementById('groups-found').textContent = allGroups.length;
+        }
+
+        function searchGroups() {
+            const searchInput = document.getElementById('search-input').value.toLowerCase().trim();
+            const groupsList = document.getElementById('groups-list');
+            groupsList.innerHTML = '';
+
+            let filteredGroups;
+            
+            if (searchInput === '') {
+                // Se busca vazia, mostrar todos os grupos
+                filteredGroups = allGroups;
+            } else {
+                // Definir sinônimos para melhorar a busca
+                const synonyms = {
+                    'musica': ['música', 'musicas', 'musics', 'music'],
+                    'reggae': ['reggae', 'rasta', 'jah', 'roots', 'jamaica'],
+                    'moda': ['fashion', 'roupas', 'estilo', 'look'],
+                    'beleza': ['beauty', 'makeup', 'cosmeticos'],
+                    'fitness': ['academia', 'treino', 'musculacao', 'gym'],
+                    'tecnologia': ['tech', 'programacao', 'desenvolvimento'],
+                    'culinaria': ['comida', 'receitas', 'gastronomia', 'cooking'],
+                    'esportes': ['futebol', 'basquete', 'volei', 'sports']
+                };
+
+                // Expandir termo de busca com sinônimos
+                let searchTerms = [searchInput];
+                for (let key in synonyms) {
+                    if (synonyms[key].includes(searchInput)) {
+                        searchTerms = searchTerms.concat(synonyms[key]);
+                        searchTerms.push(key);
+                    }
+                }
+
+                filteredGroups = allGroups.filter(group => {
+                    return searchTerms.some(term => 
+                        group.name.toLowerCase().includes(term) ||
+                        group.category.toLowerCase().includes(term) ||
+                        group.platform.toLowerCase().includes(term) ||
+                        group.description?.toLowerCase().includes(term)
+                    );
+                });
+            }
+
+            if (filteredGroups.length === 0 && searchInput !== '') {
+                groupsList.innerHTML = `
+                    <div class="text-center py-12 text-gray-500">
+                        <div class="text-6xl mb-4">🔍</div>
+                        <p class="text-lg mb-2">Nenhum grupo encontrado para "${searchInput}"</p>
+                        <p class="text-sm">Tente termos como: reggae, música, moda, tecnologia, fitness</p>
+                        <button onclick="document.getElementById('search-input').value=''; searchGroups();" 
+                                class="mt-4 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
+                            Ver Todos os Grupos
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            filteredGroups.forEach(group => {
+                const platformColor = platformColors[group.platform];
+                const platformEmoji = platformEmojis[group.platform];
+                const engagementColor = engagementColors[group.engagement];
+
+                const groupElement = document.createElement('div');
+                groupElement.className = 'bg-white rounded-lg shadow-sm p-6 mb-6 card-hover group-item';
+                groupElement.setAttribute('data-id', group.id);
+                groupElement.innerHTML = `
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-4">
+                            <input type="checkbox" class="group-checkbox w-5 h-5 text-purple-600" data-id="${group.id}" data-members="${group.members}">
+                            <div class="w-12 h-12 ${platformColor} rounded-full flex items-center justify-center text-white text-xl">${platformEmoji}</div>
+                            <div>
+                                <h4 class="text-lg font-semibold flex items-center">
+                                    ${group.name}
+                                    ${group.verified ? '<span class="text-blue-500 ml-2">✓</span>' : ''}
+                                </h4>
+                                <div class="flex items-center space-x-4 text-sm text-gray-600">
+                                    <span class="bg-gray-100 px-2 py-1 rounded">${group.category}</span>
+                                    <span>👥 ${group.members.toLocaleString()} membros</span>
+                                    <span class="text-${engagementColor}-600">📈 ${group.engagement}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-2 mb-4">
+                        ${group.hasMedia ? 
+                            `<button onclick="extractMedia(${group.id})" class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 text-sm">
+                                📁 Baixar Mídia
+                            </button>` : 
+                            `<button class="bg-gray-300 text-gray-500 px-3 py-2 rounded-lg cursor-not-allowed text-sm">
+                                📁 Sem Mídia
+                            </button>`
+                        }
+                        ${group.hasContacts ? 
+                            `<button onclick="viewMembers(${group.id})" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 text-sm">
+                                👥 Ver Membros
+                            </button>` : 
+                            `<button class="bg-gray-300 text-gray-500 px-3 py-2 rounded-lg cursor-not-allowed text-sm">
+                                👥 Sem Contatos
+                            </button>`
+                        }
+                        <button onclick="joinGroup(${group.id})" class="bg-orange-600 text-white px-3 py-2 rounded-lg hover:bg-orange-700 text-sm">
+                            🚀 Entrar no Grupo
+                        </button>
+                    </div>
+                    
+                    <div class="flex justify-end">
+                        <button onclick="selectGroup(${group.id})" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                            Selecionar
+                        </button>
+                    </div>
+                `;
+                groupsList.appendChild(groupElement);
+            });
+
+            document.getElementById('groups-found').textContent = filteredGroups.length;
+        }
+
+        function viewMembers(groupId) {
+            const group = allGroups.find(g => g.id === groupId);
+            if (!group) return;
+            
+            // Show loading message
+            const loadingMsg = document.createElement('div');
+            loadingMsg.innerHTML = `
+                <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                           background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 1000;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; margin-bottom: 10px;">👥</div>
+                        <div>Extraindo membros do grupo...</div>
+                        <div style="margin-top: 10px; font-size: 12px; color: #666;">
+                            Aguarde enquanto coletamos os dados
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(loadingMsg);
+            
+            setTimeout(() => {
+                document.body.removeChild(loadingMsg);
+                
+                // Generate realistic member data
+                const memberCount = Math.floor(group.members * 0.7); // 70% of members extractable
+                const members = [];
+                const names = [
+                    "João Silva", "Maria Santos", "Pedro Oliveira", "Ana Costa", "Carlos Souza",
+                    "Lucia Ferreira", "Roberto Lima", "Fernanda Alves", "Ricardo Pereira", "Juliana Rocha",
+                    "Marcos Barbosa", "Patricia Gomes", "Eduardo Martins", "Camila Ribeiro", "Felipe Carvalho",
+                    "Beatriz Nascimento", "Gabriel Moreira", "Larissa Cardoso", "Thiago Mendes", "Vanessa Cruz"
+                ];
+                
+                for (let i = 0; i < Math.min(memberCount, 500); i++) {
+                    const randomName = names[Math.floor(Math.random() * names.length)];
+                    const randomNumber = Math.floor(Math.random() * 900000000) + 100000000;
+                    const lastSeen = Math.floor(Math.random() * 30) + 1;
+                    
+                    members.push({
+                        name: `${randomName} ${i + 1}`,
+                        phone: `+55 11 9${randomNumber}`,
+                        lastSeen: `${lastSeen} dias atrás`,
+                        status: Math.random() > 0.3 ? 'Ativo' : 'Inativo',
+                        platform: group.platform
+                    });
+                }
+                
+                // Store extracted members globally for adding to other groups
+                window.extractedMembers = members;
+                window.sourceGroup = group;
+                
+                // Show member extraction results with add to group option
+                showMemberExtractionResults(group, members);
+                
+            }, 2000);
+        }
+        
+        function showMemberExtractionResults(group, members) {
+            const modal = document.createElement('div');
+            modal.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                           background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: white; padding: 30px; border-radius: 15px; max-width: 800px; width: 90%; max-height: 80%; overflow-y: auto;">
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <h2 style="color: #7c3aed; margin-bottom: 10px;">👥 Membros Extraídos</h2>
+                            <p style="color: #666;">Grupo: <strong>${group.name}</strong></p>
+                            <p style="color: #666;">Total extraído: <strong>${members.length} membros</strong></p>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px; padding: 15px; background: #f3f4f6; border-radius: 10px;">
+                            <h3 style="margin-bottom: 15px; color: #374151;">🎯 Adicionar Membros em Outros Grupos</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                                <input type="text" id="targetGroupLink" placeholder="Cole o link do grupo de destino" 
+                                       style="padding: 10px; border: 1px solid #d1d5db; border-radius: 5px; width: 100%;">
+                                <select id="addMethod" style="padding: 10px; border: 1px solid #d1d5db; border-radius: 5px;">
+                                    <option value="auto">Adicionar Automaticamente</option>
+                                    <option value="invite">Enviar Convites</option>
+                                    <option value="manual">Lista Manual</option>
+                                </select>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                                <button onclick="addMembersToGroup('whatsapp')" 
+                                        style="background: #25d366; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">
+                                    💬 Adicionar no WhatsApp
+                                </button>
+                                <button onclick="addMembersToGroup('telegram')" 
+                                        style="background: #0088cc; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">
+                                    ✈️ Adicionar no Telegram
+                                </button>
+                                <button onclick="addMembersToGroup('instagram')" 
+                                        style="background: #e4405f; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">
+                                    📷 Adicionar no Instagram
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <h3 style="margin-bottom: 10px;">📋 Prévia dos Membros (primeiros 10)</h3>
+                            <div style="max-height: 200px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 5px;">
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <thead style="background: #f9fafb;">
+                                        <tr>
+                                            <th style="padding: 8px; text-align: left; border-bottom: 1px solid #e5e7eb;">Nome</th>
+                                            <th style="padding: 8px; text-align: left; border-bottom: 1px solid #e5e7eb;">Telefone</th>
+                                            <th style="padding: 8px; text-align: left; border-bottom: 1px solid #e5e7eb;">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${members.slice(0, 10).map(member => `
+                                            <tr>
+                                                <td style="padding: 8px; border-bottom: 1px solid #f3f4f6;">${member.name}</td>
+                                                <td style="padding: 8px; border-bottom: 1px solid #f3f4f6;">${member.phone}</td>
+                                                <td style="padding: 8px; border-bottom: 1px solid #f3f4f6;">
+                                                    <span style="color: ${member.status === 'Ativo' ? '#10b981' : '#ef4444'};">
+                                                        ${member.status}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; justify-content: center;">
+                            <button onclick="downloadMemberList()" 
+                                    style="background: #7c3aed; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer;">
+                                📥 Baixar Lista Completa
+                            </button>
+                            <button onclick="closeMemberModal()" 
+                                    style="background: #6b7280; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer;">
+                                ❌ Fechar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            modal.id = 'memberModal';
+            document.body.appendChild(modal);
+        }
+        
+        function addMembersToGroup(platform) {
+            const targetLink = document.getElementById('targetGroupLink').value;
+            const method = document.getElementById('addMethod').value;
+            
+            if (!targetLink) {
+                alert('Por favor, cole o link do grupo de destino');
+                return;
+            }
+            
+            if (!window.extractedMembers) {
+                alert('Nenhum membro extraído encontrado');
+                return;
+            }
+            
+            // Show progress
+            const progressDiv = document.createElement('div');
+            progressDiv.innerHTML = `
+                <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                           background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 1001;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; margin-bottom: 10px;">🚀</div>
+                        <div>Adicionando membros no ${platform}...</div>
+                        <div id="addProgress" style="margin-top: 10px; font-size: 12px; color: #666;">
+                            Preparando adição...
+                        </div>
+                        <div style="width: 200px; height: 10px; background: #e5e7eb; border-radius: 5px; margin: 10px auto;">
+                            <div id="progressBar" style="width: 0%; height: 100%; background: #7c3aed; border-radius: 5px; transition: width 0.3s;"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(progressDiv);
+            
+            // Simulate adding members with progress
+            let progress = 0;
+            const totalMembers = window.extractedMembers.length;
+            let addedCount = 0;
+            let failedCount = 0;
+            
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 100) progress = 100;
+                
+                document.getElementById('progressBar').style.width = progress + '%';
+                
+                const currentMember = Math.floor((progress / 100) * totalMembers);
+                addedCount = Math.floor(currentMember * 0.8); // 80% success rate
+                failedCount = currentMember - addedCount;
+                
+                document.getElementById('addProgress').textContent = 
+                    `Adicionados: ${addedCount} | Falharam: ${failedCount} | Restam: ${totalMembers - currentMember}`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    
+                    setTimeout(() => {
+                        document.body.removeChild(progressDiv);
+                        
+                        // Show results
+                        alert(`✅ Processo concluído!\n\n` +
+                              `📊 Resultados:\n` +
+                              `• Membros adicionados: ${addedCount}\n` +
+                              `• Falhas: ${failedCount}\n` +
+                              `• Taxa de sucesso: ${Math.round((addedCount/totalMembers)*100)}%\n\n` +
+                              `🔗 Plataforma: ${platform.toUpperCase()}\n` +
+                              `📋 Método: ${method === 'auto' ? 'Automático' : method === 'invite' ? 'Convites' : 'Manual'}`);
+                        
+                        // Generate platform-specific link
+                        let platformLink = '';
+                        switch(platform) {
+                            case 'whatsapp':
+                                platformLink = targetLink.includes('whatsapp') ? targetLink : `https://chat.whatsapp.com/${targetLink}`;
+                                break;
+                            case 'telegram':
+                                platformLink = targetLink.includes('t.me') ? targetLink : `https://t.me/${targetLink}`;
+                                break;
+                            case 'instagram':
+                                platformLink = targetLink.includes('instagram') ? targetLink : `https://instagram.com/${targetLink}`;
+                                break;
+                        }
+                        
+                        // Open the target group
+                        window.open(platformLink, '_blank');
+                        
+                    }, 1000);
+                }
+            }, 200);
+        }
+        
+        function downloadMemberList() {
+            if (!window.extractedMembers) return;
+            
+            const csvContent = [
+                'Nome,Telefone,Última Atividade,Status,Plataforma',
+                ...window.extractedMembers.map(member => 
+                    `"${member.name}","${member.phone}","${member.lastSeen}","${member.status}","${member.platform}"`
+                )
+            ].join('\n');
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${window.sourceGroup.name}_MEMBROS_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+            
+            // Show success message
+            const successMsg = document.createElement('div');
+            successMsg.innerHTML = `
+                <div style="position: fixed; bottom: 20px; right: 20px; background: #10b981; color: white; 
+                           padding: 15px 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 1002;">
+                    ✅ Lista de membros baixada com sucesso!
+                </div>
+            `;
+            document.body.appendChild(successMsg);
+            
+            setTimeout(() => {
+                document.body.removeChild(successMsg);
+            }, 3000);
+        }
+        
+        function closeMemberModal() {
+            const modal = document.getElementById('memberModal');
+            if (modal) {
+                document.body.removeChild(modal);
+            }
+        }
+
+        function showNotification(message) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #333;
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                z-index: 10000;
+                max-width: 400px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                font-size: 14px;
+                line-height: 1.4;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // Auto remove after 4 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 4000);
+        }
+
+        function joinGroup(groupId, callback) {
+            const group = allGroups.find(g => g.id === groupId);
+            if (!group) return;
+            
+            let groupUrl = '';
+            const platformName = group.platform.charAt(0).toUpperCase() + group.platform.slice(1);
+            
+            switch(group.platform) {
+                case 'whatsapp':
+                    groupUrl = `https://chat.whatsapp.com/${Math.random().toString(36).substring(2, 15)}`;
+                    break;
+                case 'telegram':
+                    groupUrl = `https://t.me/${group.name.replace(/\s+/g, '').toLowerCase()}`;
+                    break;
+                case 'instagram':
+                    groupUrl = `https://instagram.com/${group.name.replace(/\s+/g, '').toLowerCase()}`;
+                    break;
+                case 'facebook':
+                    groupUrl = `https://facebook.com/groups/${Math.random().toString(36).substring(2, 15)}`;
+                    break;
+                case 'discord':
+                    groupUrl = `https://discord.gg/${Math.random().toString(36).substring(2, 10)}`;
+                    break;
+            }
+            
+            showNotification(`🔗 Abrindo ${platformName} para entrar no grupo "${group.name}"...`);
+            window.open(groupUrl, '_blank');
+            
+            // Simulate joining process
+            setTimeout(() => {
+                showNotification(`✅ Entrada no grupo "${group.name}" simulada com sucesso!`);
+                if (callback) callback();
+            }, 2000);
+        }
+
+</script>
